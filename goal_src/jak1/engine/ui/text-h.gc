@@ -803,6 +803,8 @@
   (pad-square #x2003)
 
   (save-and-load-game #x3000)
+
+  (start-new-level #x3001)
   ;; GAME-TEXT-ID ENUM ENDS
   )
 
