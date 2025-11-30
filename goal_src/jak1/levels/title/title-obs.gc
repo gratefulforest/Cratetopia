@@ -169,7 +169,7 @@
   :code
     (behavior ()
       (while (!= (file-status *art-control* (-> self next-anim name) 0) 'active)
-        (set-blackout-frames (seconds 0.05))
+        (set-blackout-frames (seconds 2.7))
         (suspend))
       (set! (-> *setting-control* current bg-a) 1.0)
       (set-setting! 'bg-a 'abs 0.0 0)
@@ -218,11 +218,7 @@
                   (400 display-level village1 display)
                   (400 save)
                   (500 set! *spawn-actors* #t))))
-      (ja-play-spooled-anim (-> self anim)
-                            (the-as art-joint-anim #f)
-                            (the-as art-joint-anim #f)
-                            (the-as (function process-drawable symbol) false-func))
-      (set! *spawn-actors* #f)
+      (set! *spawn-actors* #t)
       (add-setting! 'process-mask 'set 0.0 (process-mask progress))
       (apply-settings *setting-control*)
       (deactivate (handle->process (-> self black)))
@@ -434,6 +430,7 @@
          (else (initialize-skeleton self *logo-sg* '()))))
      (set! (-> self main-joint) (new 'process 'joint-mod (joint-mod-handler-mode joint-set*) self 3))
      (set! (-> self main-joint max-dist) (the-as meters #t))
+     (play-main-music "beach.wav" (the int (* (-> *setting-control* default music-volume) 1.5)))
      (set! (-> self next-anim)
            (new 'static
                 'spool-anim
