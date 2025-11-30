@@ -349,6 +349,8 @@
           ))))
   0)
 
+(define-extern spawn-block-game (function none))
+
 (defbehavior display-loop process ()
   "the main 'display loop' in GOAL. v-sync is done in this function, so all frames start and end here."
   ;; increase our stack size.
@@ -370,6 +372,8 @@
     (suspend)
     (while *run*
       (runs-every-frame) ;; trigger hook for mod base mod-base-change entry point
+      (when (and (!= (-> *load-state* want 0 name) 'title) (not (process-by-name "block-game-entity" *active-pool*)))
+        (spawn-block-game))
       ;; start immediately after all process updates finish.
       (profiler-instant-event "display-loop-top")
       ;; drawing effects to be used in foreground drawing.
