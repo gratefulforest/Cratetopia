@@ -2115,7 +2115,8 @@
   (set! (-> *options-remap* (progress-screen memcard-auto-save-error)) *ok-options*)
   (set! (-> *options-remap* (progress-screen memcard-removed)) *ok-options*)
   (set! (-> *options-remap* (progress-screen memcard-no-data)) *yes-no-options*)
-  (set! (-> *options-remap* (progress-screen title)) *title-pc*)
+  (set! (-> *options-remap* (progress-screen title)) *block-game-options*)
+  (set! (-> *block-game-options* 0 value-to-modify) (&-> *progress-carousell* int-backup))
   (set! (-> *options-remap* (progress-screen settings-title)) *options*)
   (set! (-> *options-remap* (progress-screen auto-save)) *ok-options*)
   (set! (-> *options-remap* (progress-screen pal-change-to-60hz)) *yes-no-options*)
@@ -2123,10 +2124,6 @@
   (set! (-> *options-remap* (progress-screen no-disc)) *ok-options*)
   (set! (-> *options-remap* (progress-screen bad-disc)) *ok-options*)
   (set! (-> *options-remap* (progress-screen quit)) *yes-no-options*)
-
-  (set! (-> *options-remap* (progress-screen title)) *block-game-options*)
-  (set! (-> *block-game-options* 0 value-to-modify) (&-> *progress-carousell* int-backup))
-
   ;; our screens!
   (set! (-> *options-remap* (progress-screen aspect-msg)) *yes-no-options*)
   (set! (-> *options-remap* (progress-screen input-options)) *input-options*)
