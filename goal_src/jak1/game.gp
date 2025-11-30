@@ -1663,6 +1663,7 @@
 ;; requires a .glb model file in custom_assets/jak1/models/custom_levels
 ;; to also generate a collide-mesh, add :gen-mesh #t
 (build-actor "test-actor" :gen-mesh #t)
+(build-actor "block-game" :gen-mesh #t)
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;; Game Engine Code
@@ -2050,6 +2051,7 @@
  "common-obs/linear-plat.gc"
  "common-obs/ropebridge.gc"
  "common-obs/ticky.gc"
+ "common-obs/block-obs.gc"
  )
 
 (copy-mus-files "DANGER")
