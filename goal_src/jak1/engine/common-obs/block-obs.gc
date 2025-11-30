@@ -17,7 +17,7 @@
 (defmethod projectile-method-28 ((this yellow-shot))
   (none))
 
-(defpart 10000
+(defpart 3000
   :init-specs
   ((:texture (new 'static 'texture-id :index #xc :page #x2))
    (:birth-func 'birth-func-set-quat)
@@ -31,7 +31,7 @@
    (:timer (seconds 0.017))
    (:flags (bit2 bit3 bit14 left-multiply-quat))))
 
-(defpart 10001
+(defpart 3001
   :init-specs
   ((:texture (new 'static 'texture-id :index #xc :page #x2))
    (:birth-func 'birth-func-set-quat)
@@ -546,7 +546,7 @@
         (end (new-stack-vector0)))
     (set-vector! start (+ (-> loc x) (* start-x (meters 0.975))) (+ (-> loc y) (* start-y (meters 0.975))) (-> loc z) 1.0)
     (set-vector! end (+ (-> loc x) (* end-x (meters 0.975))) (+ (-> loc y) (* end-y (meters 0.975))) (-> loc z) 1.0)
-    (draw-eco-line start end 10001))
+    (draw-eco-line start end 3001))
   (none))
 
 (defbehavior draw-digit block-game ((loc vector) (value int))
@@ -638,10 +638,10 @@
       (draw-score level (the float (-> self level)) 4)
       (vector+! start (-> self root trans) (static-vectorm -1.5 2.0 0.0))
       (vector+! end (-> self root trans) (static-vectorm -1.5 -38.0 0.0))
-      (draw-eco-line start end 10000)
+      (draw-eco-line start end 3000)
       (vector+! start (-> self root trans) (static-vectorm 19.5 2.0 0.0))
       (vector+! end (-> self root trans) (static-vectorm 19.5 -38.0 0.0))
-      (draw-eco-line start end 10000))
+      (draw-eco-line start end 3000))
     (ja-post)))
 
 (defun spawn-block-game ()
