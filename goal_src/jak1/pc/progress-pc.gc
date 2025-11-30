@@ -757,6 +757,30 @@
             :scale #t)
        (new 'static 'game-option :option-type (game-option-type button) :name (text-id back) :scale #t)))
 
+(define *block-game-options*
+  (new 'static
+       'boxed-array
+       :type
+       game-option
+       (new 'static
+            'game-option
+            :option-type (game-option-type slider)
+            :name (text-id start-new-level)
+            :scale #t
+            :param1 0.0
+            :param2 19.0
+            :slider-step-size 0.25
+            :on-confirm
+            (lambda ()
+              (initialize! *game-info* 'game (the-as game-save #f) "village1-hut")))
+       (new 'static
+            'game-option
+            :option-type (game-option-type menu)
+            :name (text-id options)
+            :scale #t
+            :param3 (game-option-menu settings-title))
+       (new 'static 'game-option :option-type (game-option-type button) :name (text-id back) :scale #t)))
+
 (define *title-pc*
   (new 'static
        'boxed-array
@@ -2099,6 +2123,10 @@
   (set! (-> *options-remap* (progress-screen no-disc)) *ok-options*)
   (set! (-> *options-remap* (progress-screen bad-disc)) *ok-options*)
   (set! (-> *options-remap* (progress-screen quit)) *yes-no-options*)
+
+  (set! (-> *options-remap* (progress-screen title)) *block-game-options*)
+  (set! (-> *block-game-options* 0 value-to-modify) (&-> *progress-carousell* int-backup))
+
   ;; our screens!
   (set! (-> *options-remap* (progress-screen aspect-msg)) *yes-no-options*)
   (set! (-> *options-remap* (progress-screen input-options)) *input-options*)
