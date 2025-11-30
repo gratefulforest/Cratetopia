@@ -2309,7 +2309,7 @@
        '()
        :sound-banks
        '()
-       :music-bank 'village1
+       :music-bank #f
        :ambient-sounds
        '()
        :mood '*village1-mood*
