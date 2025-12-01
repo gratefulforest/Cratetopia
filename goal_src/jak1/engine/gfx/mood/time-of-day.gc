@@ -42,14 +42,15 @@
      0))
   ;; spawn or kill sun, if needed
   (cond
-    ((and (>= (-> self time-of-day) 6.25) (< (-> self time-of-day) 18.75) (!= (-> *time-of-day-context* sun-fade) 0.0))
+    ((and (!= (-> *level* level0 name) 'title) (>= (-> self time-of-day) 6.25) (< (-> self time-of-day) 18.75) (!= (-> *time-of-day-context* sun-fade) 0.0))
      (when (and *dproc* (zero? (-> self sun-count)))
        (spawn (-> self sun) (math-camera-pos))
        (+! (-> self sun-count) 1)))
     ((> (-> self sun-count) 0) (kill-and-free-particles (-> self sun)) (set! (-> self sun-count) 0) 0))
   ;; spawn or kill green sun, if needed
   (cond
-    ((and (or (>= (-> self time-of-day) 21.75) (>= 10.25 (-> self time-of-day)))
+    ((and (!= (-> *level* level0 name) 'title)
+          (or (>= (-> self time-of-day) 21.75) (>= 10.25 (-> self time-of-day)))
           (!= (-> *time-of-day-context* sun-fade) 0.0))
      (when (and *dproc* (zero? (-> self green-sun-count)))
        (spawn (-> self green-sun) (math-camera-pos))
