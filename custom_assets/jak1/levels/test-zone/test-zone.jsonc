@@ -1,333 +1,2129 @@
 {
-  // The "in-game" name of the level. Should be lower case, with dashes (GOAL symbol name)
-  // the name of this file, and the folder this file is in must have the same name.
-  // The long_name must also be 10 characters or fewer.
-  "long_name": "test-zone",
-  // The file name, should be upper case and 8 characters or less.
-  "iso_name": "TESTZONE",
-  // The nickname, should be exactly 3 characters
-  "nickname": "tsz", // 3 char name, all lowercase
-  // Background mesh file.
-  // Must have vertex colors. Use the blender cycles renderer, bake, diffuse, uncheck color,
-  // and bake to vertex colors. For now, only the first vertex color group is used, so make sure you
-  // only have 1.
-  "gltf_file": "custom_assets/jak1/levels/test-zone/test-zone2.glb",
 
-  // automatically set wall vs. ground based on angle. Useful if you don't want to assign this yourself
+  "long_name": "test-zone",
+  "iso_name": "TESTZONE",
+  "nickname": "tsz",
+  "gltf_file": "custom_assets/jak1/levels/test-zone/test-zone.glb",
   "automatic_wall_detection": true,
   "automatic_wall_angle": 45.0,
-
-  // if your mesh has triangles with incorrect orientation, set this to make all collision mesh triangles double sided
-  // this makes collision 2x slower and bigger, so only use if really needed
   "double_sided_collide": false,
+  "base_id": 100,
 
-  // available res-lump tag types:
-  // integer types: int32, uint32, enum-int32, enum-uint32
-  // float types: float, meters (1 meter = 4096.0 units), degrees (65536.0 = 360°)
-  // vector types: vector (normal floats), vector4m (meters), vector3m (meters with w set to 1.0), vector-vol (normal floats with w in meters), movie-pos (meters with w in degrees)
-  // special types: symbol, type, string, eco-info, cell-info, buzzer-info, water-height
-  //
-  // examples:
-  //
-  // adds a float tag 'spring-height' with value of 200 meters (1 meter = 4096.0 units):
-  // "spring-height": ["meters", 200.0]
-  //
-  // adds a degrees tag 'rotoffset':
-  // "rotoffset": ["degrees", -45.0]
-  //
-  // adds a movie-pos tag:
-  // "movie-pos": ["movie-pos", [100.22, -25.3, 99.5, 180.0]]
-  //
-  // adds an enum tag 'options':
-  // "options": ["enum-int32", "(fact-options large)"]
-  //
-  // adds a water-height tag:
-  // "water-height": ["water-height", 25.0, 0.5, 2.0, "(water-flags wt08 wt03 wt01)"]
-  //
-  // adds an eco-info tag:
-  // "eco-info": ["eco-info", "(pickup-type health)", 2]
-  //
-  // adds a cell-info tag:
-  // "eco-info": ["cell-info", "(game-task training-gimmie)"]
-  //
-  // adds a buzzer-info tag:
-  // "eco-info": ["buzzer-info", "(game-task training-buzzer)", 5]
-  //
-  // adds a 'symbol' tag (using the 'type' and 'string' lump types works the same way):
-  // "symbol-list": ["symbol", "sym-1", "sym-2"]
+  "art_groups": [],
 
-  // The base actor id for your custom level. If you have multiple levels, this should be unique!
-  "base_id": 10000,
+  "custom_models": [],
 
-  // All art groups you want to use in your custom level. Will add their models and corresponding textures to the FR3 file.
-  // Note: You will still have to add them to your level's .gd file.
-  // "art_groups": ["plat-ag"],
-  "art_groups": ["babak-ag", "plat-ag", "plat-eco-ag"],
+  "textures": [["village1-vis-alpha"]],
 
-  // If you have any custom models in the "custom_assets/jak1/models/custom_levels" folder that you want to use in your level, add them to this list.
-  // Note: Like with art groups, these should also be added to your level's .gd file.
-  "custom_models": ["test-actor"],
-
-  // Any textures you want to include in your custom level. This is mainly useful for things such as the zoomer HUD,
-  // sky textures and cases where you want to use objects drawn with the generic renderer,
-  // which also requires you to set a texture remap table and a list of tpages.
-  // To get a list of all the textures, you can extract all of the game's textures
-  // by setting "save_texture_pngs" to true in the decompiler config.
-  // The format is ["tpage-name", "texture-name1", "texture-name2", ...].
-  // If you want all textures from a tpage, you can just do ["tpage-name"].
-  "textures": [
-    // Zoomer HUD textures
-    // ["zoomerhud"],
-    // Sandover sky textures
-    ["village1-vis-alpha"]
-  ],
-
-  // Which vanilla level's texture remap table to use.
-  // This is needed if you want to have proper textures for objects that are drawn using generic, such as
-  // dark eco pools or dying enemies. If you choose to use this,
-  // the order of art groups and tpages in your level's .gd MUST match the vanilla level's for the textures to work.
   "tex_remap": "village1",
 
-  // Which sky to use for your custom level. This needs to be the name of a vanilla level with sky textures.
-  // Your level's mood update needs to be set up to copy the sky texture (update-mood-default already handles this as an example).
-  // You also need to add a specific tpage to your level .gd depending on the level you chose:
-  // training:   tpage-1308.go
-  // village1:   tpage-401.go
-  // beach:      tpage-215.go
-  // jungle:     tpage-388.go
-  // misty:      tpage-520.go
-  // firecanyon: tpage-1123.go
-  // village2:   tpage-921.go
-  // rolling:    tpage-925.go
-  // sunkenb:    tpage-162.go
-  // swamp:      tpage-630.go
-  // ogre:       tpage-1117.go
-  // village3:   tpage-1194.go
-  // snow:       tpage-712.go
-  // finalboss:  tpage-1418.go
-  // The tpage you choose also has to be in the alpha (4th) slot in the "tpages" list below.
   "sky": "village1",
 
-  // Any texture pages that are added to the level's "texture-ids" array.
-  // These will be logged in and linked as part of level loading.
-  // There are five tpage categories, in this order:
-  // - tfrag
-  // - pris
-  // - shrub
-  // - alpha
-  // - water
-  // This is also (with the exception of levels that use the zoomer) the order that the tpages are listed in in the vanilla .gd files.
-  // You need to also add these to your level .gd as well.
-  // Sky textures use the alpha slot.
-  // If this is empty and "tex_remap" and "sky" are the same level, this will be auto-filled with the tpages from the
-  // corresponding level (check its .gd file for the art group/tpage order to copy over).
   "tpages": [],
 
-  // Ambients you want to use in your custom level. Ambients can be used for various things like changing the music variation (flava),
-  // adding ambient sounds, level name hints, etc.
-  "ambients": [
+  "ambients": [],
+
+  "actors" : [
+
     {
-      "trans": [-21.6238, 20.0496, 17.1191, 10.0],
-      "bsphere": [-21.6238, 20.0496, 17.1191, 15.0],
+      "trans": [-397.2399, 78.6324, -147.2285],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-397.2399, 78.6324, -147.2285, 10],
       "lump": {
-        "name": "test-ambient",
-        "type": "'hint",
-        "text-id": ["enum-uint32", "(text-id fuel-cell)"], // text id for the "POWER CELL" text
-        "play-mode": "'notice"
+        "name": "Empty_0"
+      }
+    },
+
+    {
+      "trans": [41.9086, 378.2191, -173.6864],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [41.9086, 378.2191, -173.6864, 10],
+      "lump": {
+        "name": "Empty_1"
+      }
+    },
+
+    {
+      "trans": [-139.5139, 596.8243, -143.6856],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-139.5139, 596.8243, -143.6856, 10],
+      "lump": {
+        "name": "Empty_2"
+      }
+    },
+
+    {
+      "trans": [-177.6576, 492.6189, 213.6881],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-177.6576, 492.6189, 213.6881, 10],
+      "lump": {
+        "name": "Empty_3"
+      }
+    },
+
+    {
+      "trans": [59.1146, 575.5468, -18.8987],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [59.1146, 575.5468, -18.8987, 10],
+      "lump": {
+        "name": "Empty_4"
+      }
+    },
+
+    {
+      "trans": [-66.4122, 288.6853, 324.4478],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-66.4122, 288.6853, 324.4478, 10],
+      "lump": {
+        "name": "Empty_5"
+      }
+    },
+
+    {
+      "trans": [171.2785, 371.7936, -301.3922],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [171.2785, 371.7936, -301.3922, 10],
+      "lump": {
+        "name": "Empty_6"
+      }
+    },
+
+    {
+      "trans": [212.83, 155.7859, 213.5856],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [212.83, 155.7859, 213.5856, 10],
+      "lump": {
+        "name": "Empty_7"
+      }
+    },
+
+    {
+      "trans": [-407.6808, 534.5867, 311.4242],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-407.6808, 534.5867, 311.4242, 10],
+      "lump": {
+        "name": "Empty_8"
+      }
+    },
+
+    {
+      "trans": [-186.5842, -28.4244, 291.8232],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-186.5842, -28.4244, 291.8232, 10],
+      "lump": {
+        "name": "Empty_9"
+      }
+    },
+
+    {
+      "trans": [-150.8898, 342.8635, -240.7939],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-150.8898, 342.8635, -240.7939, 10],
+      "lump": {
+        "name": "Empty_10"
+      }
+    },
+
+    {
+      "trans": [-389.1183, 183.8563, -162.1093],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-389.1183, 183.8563, -162.1093, 10],
+      "lump": {
+        "name": "Empty_11"
+      }
+    },
+
+    {
+      "trans": [93.2069, 472.48, 244.3362],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [93.2069, 472.48, 244.3362, 10],
+      "lump": {
+        "name": "Empty_12"
+      }
+    },
+
+    {
+      "trans": [-97.9647, 430.9343, -279.9367],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-97.9647, 430.9343, -279.9367, 10],
+      "lump": {
+        "name": "Empty_13"
+      }
+    },
+
+    {
+      "trans": [-43.32, 274.1405, -42.862],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-43.32, 274.1405, -42.862, 10],
+      "lump": {
+        "name": "Empty_14"
+      }
+    },
+
+    {
+      "trans": [-366.3405, 294.2871, -60.509],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-366.3405, 294.2871, -60.509, 10],
+      "lump": {
+        "name": "Empty_15"
+      }
+    },
+
+    {
+      "trans": [-229.0366, 59.1355, 76.2577],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-229.0366, 59.1355, 76.2577, 10],
+      "lump": {
+        "name": "Empty_16"
+      }
+    },
+
+    {
+      "trans": [-393.6211, 216.7203, 111.9859],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-393.6211, 216.7203, 111.9859, 10],
+      "lump": {
+        "name": "Empty_17"
+      }
+    },
+
+    {
+      "trans": [169.9479, 678.4236, -19.0327],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [169.9479, 678.4236, -19.0327, 10],
+      "lump": {
+        "name": "Empty_18"
+      }
+    },
+
+    {
+      "trans": [-421.2018, 622.8019, -74.5193],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-421.2018, 622.8019, -74.5193, 10],
+      "lump": {
+        "name": "Empty_19"
+      }
+    },
+
+    {
+      "trans": [125.1732, 664.8959, -173.4978],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [125.1732, 664.8959, -173.4978, 10],
+      "lump": {
+        "name": "Empty_20"
+      }
+    },
+
+    {
+      "trans": [-41.169, 161.0017, -303.9605],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-41.169, 161.0017, -303.9605, 10],
+      "lump": {
+        "name": "Empty_21"
+      }
+    },
+
+    {
+      "trans": [-447.1175, 229.4358, -275.11],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-447.1175, 229.4358, -275.11, 10],
+      "lump": {
+        "name": "Empty_22"
+      }
+    },
+
+    {
+      "trans": [-154.3708, 485.6813, -30.0878],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-154.3708, 485.6813, -30.0878, 10],
+      "lump": {
+        "name": "Empty_23"
+      }
+    },
+
+    {
+      "trans": [-428.9894, 503.1167, 354.6139],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-428.9894, 503.1167, 354.6139, 10],
+      "lump": {
+        "name": "Empty_24"
+      }
+    },
+
+    {
+      "trans": [-244.6233, 471.2329, 316.1048],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-244.6233, 471.2329, 316.1048, 10],
+      "lump": {
+        "name": "Empty_25"
+      }
+    },
+
+    {
+      "trans": [69.3636, 459.703, 136.4942],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [69.3636, 459.703, 136.4942, 10],
+      "lump": {
+        "name": "Empty_26"
+      }
+    },
+
+    {
+      "trans": [145.1236, 66.666, 286.2353],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [145.1236, 66.666, 286.2353, 10],
+      "lump": {
+        "name": "Empty_27"
+      }
+    },
+
+    {
+      "trans": [-148.9658, 186.4717, 16.5177],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-148.9658, 186.4717, 16.5177, 10],
+      "lump": {
+        "name": "Empty_28"
+      }
+    },
+
+    {
+      "trans": [-36.2106, 490.4704, 404.4745],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-36.2106, 490.4704, 404.4745, 10],
+      "lump": {
+        "name": "Empty_29"
+      }
+    },
+
+    {
+      "trans": [-374.1244, 645.4346, -156.2621],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-374.1244, 645.4346, -156.2621, 10],
+      "lump": {
+        "name": "Empty_30"
+      }
+    },
+
+    {
+      "trans": [159.8024, 321.2388, -217.1517],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [159.8024, 321.2388, -217.1517, 10],
+      "lump": {
+        "name": "Empty_31"
+      }
+    },
+
+    {
+      "trans": [-41.9067, 584.9201, -175.997],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-41.9067, 584.9201, -175.997, 10],
+      "lump": {
+        "name": "Empty_32"
+      }
+    },
+
+    {
+      "trans": [201.2412, 563.1149, -145.2345],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [201.2412, 563.1149, -145.2345, 10],
+      "lump": {
+        "name": "Empty_33"
+      }
+    },
+
+    {
+      "trans": [-50.7258, 604.6824, -303.5156],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-50.7258, 604.6824, -303.5156, 10],
+      "lump": {
+        "name": "Empty_34"
+      }
+    },
+
+    {
+      "trans": [180.4788, 260.4802, -73.8505],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [180.4788, 260.4802, -73.8505, 10],
+      "lump": {
+        "name": "Empty_35"
+      }
+    },
+
+    {
+      "trans": [-350.9477, 116.7254, -331.0806],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-350.9477, 116.7254, -331.0806, 10],
+      "lump": {
+        "name": "Empty_36"
+      }
+    },
+
+    {
+      "trans": [9.776, 469.778, -321.3951],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [9.776, 469.778, -321.3951, 10],
+      "lump": {
+        "name": "Empty_37"
+      }
+    },
+
+    {
+      "trans": [246.7736, 574.9343, -97.012],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [246.7736, 574.9343, -97.012, 10],
+      "lump": {
+        "name": "Empty_38"
+      }
+    },
+
+    {
+      "trans": [168.0061, 542.4148, 288.0249],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [168.0061, 542.4148, 288.0249, 10],
+      "lump": {
+        "name": "Empty_39"
+      }
+    },
+
+    {
+      "trans": [172.1466, 262.2505, -317.8215],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [172.1466, 262.2505, -317.8215, 10],
+      "lump": {
+        "name": "Empty_40"
+      }
+    },
+
+    {
+      "trans": [153.2383, 134.6585, -217.0537],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [153.2383, 134.6585, -217.0537, 10],
+      "lump": {
+        "name": "Empty_41"
+      }
+    },
+
+    {
+      "trans": [109.8221, 50.1583, 54.0565],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [109.8221, 50.1583, 54.0565, 10],
+      "lump": {
+        "name": "Empty_42"
+      }
+    },
+
+    {
+      "trans": [-442.305, 371.9653, 78.1907],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-442.305, 371.9653, 78.1907, 10],
+      "lump": {
+        "name": "Empty_43"
+      }
+    },
+
+    {
+      "trans": [-403.3637, 267.1674, -23.8973],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-403.3637, 267.1674, -23.8973, 10],
+      "lump": {
+        "name": "Empty_44"
+      }
+    },
+
+    {
+      "trans": [80.568, 385.6872, 231.7562],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [80.568, 385.6872, 231.7562, 10],
+      "lump": {
+        "name": "Empty_45"
+      }
+    },
+
+    {
+      "trans": [-70.4055, 589.7128, 350.6253],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-70.4055, 589.7128, 350.6253, 10],
+      "lump": {
+        "name": "Empty_46"
+      }
+    },
+
+    {
+      "trans": [-428.7218, -45.9135, -122.694],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-428.7218, -45.9135, -122.694, 10],
+      "lump": {
+        "name": "Empty_47"
+      }
+    },
+
+    {
+      "trans": [217.93, 511.8124, -58.0891],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [217.93, 511.8124, -58.0891, 10],
+      "lump": {
+        "name": "Empty_48"
+      }
+    },
+
+    {
+      "trans": [-322.6451, 257.8835, 115.8533],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-322.6451, 257.8835, 115.8533, 10],
+      "lump": {
+        "name": "Empty_49"
+      }
+    },
+
+    {
+      "trans": [-194.1335, 106.9508, -44.9187],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-194.1335, 106.9508, -44.9187, 10],
+      "lump": {
+        "name": "Empty_50"
+      }
+    },
+
+    {
+      "trans": [-333.0766, 291.927, -186.3495],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-333.0766, 291.927, -186.3495, 10],
+      "lump": {
+        "name": "Empty_51"
+      }
+    },
+
+    {
+      "trans": [-1.2347, 304.0609, 301.0042],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-1.2347, 304.0609, 301.0042, 10],
+      "lump": {
+        "name": "Empty_52"
+      }
+    },
+
+    {
+      "trans": [-392.0521, 44.2292, -236.8367],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-392.0521, 44.2292, -236.8367, 10],
+      "lump": {
+        "name": "Empty_53"
+      }
+    },
+
+    {
+      "trans": [-410.6049, 233.2272, -4.856],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-410.6049, 233.2272, -4.856, 10],
+      "lump": {
+        "name": "Empty_54"
+      }
+    },
+
+    {
+      "trans": [-157.7086, 413.5089, -176.5037],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-157.7086, 413.5089, -176.5037, 10],
+      "lump": {
+        "name": "Empty_55"
+      }
+    },
+
+    {
+      "trans": [-107.9919, 359.508, -131.2336],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-107.9919, 359.508, -131.2336, 10],
+      "lump": {
+        "name": "Empty_56"
+      }
+    },
+
+    {
+      "trans": [-106.0111, 319.704, 44.65],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-106.0111, 319.704, 44.65, 10],
+      "lump": {
+        "name": "Empty_57"
+      }
+    },
+
+    {
+      "trans": [-65.9973, 629.9864, 138.7033],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-65.9973, 629.9864, 138.7033, 10],
+      "lump": {
+        "name": "Empty_58"
+      }
+    },
+
+    {
+      "trans": [52.6156, 402.0658, 80.5789],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [52.6156, 402.0658, 80.5789, 10],
+      "lump": {
+        "name": "Empty_59"
+      }
+    },
+
+    {
+      "trans": [111.2282, 517.0586, 179.6623],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [111.2282, 517.0586, 179.6623, 10],
+      "lump": {
+        "name": "Empty_60"
+      }
+    },
+
+    {
+      "trans": [244.7348, 615.0226, -282.6142],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [244.7348, 615.0226, -282.6142, 10],
+      "lump": {
+        "name": "Empty_61"
+      }
+    },
+
+    {
+      "trans": [-3.4483, 2.0477, 322.1749],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-3.4483, 2.0477, 322.1749, 10],
+      "lump": {
+        "name": "Empty_62"
+      }
+    },
+
+    {
+      "trans": [-17.2259, 363.5549, 232.8646],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-17.2259, 363.5549, 232.8646, 10],
+      "lump": {
+        "name": "Empty_63"
+      }
+    },
+
+    {
+      "trans": [-125.9627, 374.0908, -17.7714],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-125.9627, 374.0908, -17.7714, 10],
+      "lump": {
+        "name": "Empty_64"
+      }
+    },
+
+    {
+      "trans": [-57.5735, 126.8015, -330.5359],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-57.5735, 126.8015, -330.5359, 10],
+      "lump": {
+        "name": "Empty_65"
+      }
+    },
+
+    {
+      "trans": [137.0345, 164.3435, -132.5186],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [137.0345, 164.3435, -132.5186, 10],
+      "lump": {
+        "name": "Empty_66"
+      }
+    },
+
+    {
+      "trans": [-351.5962, 389.823, 322.8161],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-351.5962, 389.823, 322.8161, 10],
+      "lump": {
+        "name": "Empty_67"
+      }
+    },
+
+    {
+      "trans": [-150.5278, 391.1302, -245.3228],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-150.5278, 391.1302, -245.3228, 10],
+      "lump": {
+        "name": "Empty_68"
+      }
+    },
+
+    {
+      "trans": [-307.502, 86.9966, -101.2244],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-307.502, 86.9966, -101.2244, 10],
+      "lump": {
+        "name": "Empty_69"
+      }
+    },
+
+    {
+      "trans": [-270.8765, 117.1588, 42.3736],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-270.8765, 117.1588, 42.3736, 10],
+      "lump": {
+        "name": "Empty_70"
+      }
+    },
+
+    {
+      "trans": [11.2744, 126.8495, 186.7368],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [11.2744, 126.8495, 186.7368, 10],
+      "lump": {
+        "name": "Empty_71"
+      }
+    },
+
+    {
+      "trans": [91.5574, 463.1892, 92.3196],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [91.5574, 463.1892, 92.3196, 10],
+      "lump": {
+        "name": "Empty_72"
+      }
+    },
+
+    {
+      "trans": [-74.8214, 228.3708, -67.0341],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-74.8214, 228.3708, -67.0341, 10],
+      "lump": {
+        "name": "Empty_73"
+      }
+    },
+
+    {
+      "trans": [-461.0269, 435.7725, -280.4606],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-461.0269, 435.7725, -280.4606, 10],
+      "lump": {
+        "name": "Empty_74"
+      }
+    },
+
+    {
+      "trans": [30.2201, 426.9218, -159.1224],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [30.2201, 426.9218, -159.1224, 10],
+      "lump": {
+        "name": "Empty_75"
+      }
+    },
+
+    {
+      "trans": [-307.7338, 509.5421, -254.862],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-307.7338, 509.5421, -254.862, 10],
+      "lump": {
+        "name": "Empty_76"
+      }
+    },
+
+    {
+      "trans": [-199.104, 392.8754, -53.1934],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-199.104, 392.8754, -53.1934, 10],
+      "lump": {
+        "name": "Empty_77"
+      }
+    },
+
+    {
+      "trans": [-111.8128, 138.819, 139.3355],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-111.8128, 138.819, 139.3355, 10],
+      "lump": {
+        "name": "Empty_78"
+      }
+    },
+
+    {
+      "trans": [20.0123, 166.4006, 229.5422],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [20.0123, 166.4006, 229.5422, 10],
+      "lump": {
+        "name": "Empty_79"
+      }
+    },
+
+    {
+      "trans": [149.0874, 447.6085, 373.6567],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [149.0874, 447.6085, 373.6567, 10],
+      "lump": {
+        "name": "Empty_80"
+      }
+    },
+
+    {
+      "trans": [-117.9403, 88.2193, 385.9962],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-117.9403, 88.2193, 385.9962, 10],
+      "lump": {
+        "name": "Empty_81"
+      }
+    },
+
+    {
+      "trans": [4.9938, 76.4722, -44.4383],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [4.9938, 76.4722, -44.4383, 10],
+      "lump": {
+        "name": "Empty_82"
+      }
+    },
+
+    {
+      "trans": [0.4892, 657.9097, -159.0589],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [0.4892, 657.9097, -159.0589, 10],
+      "lump": {
+        "name": "Empty_83"
+      }
+    },
+
+    {
+      "trans": [-114.2535, 49.0221, -152.5517],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-114.2535, 49.0221, -152.5517, 10],
+      "lump": {
+        "name": "Empty_84"
+      }
+    },
+
+    {
+      "trans": [-174.6685, 37.6808, -66.7182],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-174.6685, 37.6808, -66.7182, 10],
+      "lump": {
+        "name": "Empty_85"
+      }
+    },
+
+    {
+      "trans": [-270.3433, 530.5344, -114.1819],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-270.3433, 530.5344, -114.1819, 10],
+      "lump": {
+        "name": "Empty_86"
+      }
+    },
+
+    {
+      "trans": [-408.3821, 51.5937, 201.38],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-408.3821, 51.5937, 201.38, 10],
+      "lump": {
+        "name": "Empty_87"
+      }
+    },
+
+    {
+      "trans": [-21.0877, 97.2514, -50.9007],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-21.0877, 97.2514, -50.9007, 10],
+      "lump": {
+        "name": "Empty_88"
+      }
+    },
+
+    {
+      "trans": [-415.1945, 371.0203, 313.0852],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-415.1945, 371.0203, 313.0852, 10],
+      "lump": {
+        "name": "Empty_89"
+      }
+    },
+
+    {
+      "trans": [-234.9055, 65.6961, -11.52],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-234.9055, 65.6961, -11.52, 10],
+      "lump": {
+        "name": "Empty_90"
+      }
+    },
+
+    {
+      "trans": [-438.981, 104.2548, -92.9558],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-438.981, 104.2548, -92.9558, 10],
+      "lump": {
+        "name": "Empty_91"
+      }
+    },
+
+    {
+      "trans": [53.4125, 554.1189, 357.8482],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [53.4125, 554.1189, 357.8482, 10],
+      "lump": {
+        "name": "Empty_92"
+      }
+    },
+
+    {
+      "trans": [-466.0434, 607.1021, -287.1024],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-466.0434, 607.1021, -287.1024, 10],
+      "lump": {
+        "name": "Empty_93"
+      }
+    },
+
+    {
+      "trans": [-203.8786, 644.3802, -325.2406],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-203.8786, 644.3802, -325.2406, 10],
+      "lump": {
+        "name": "Empty_94"
+      }
+    },
+
+    {
+      "trans": [155.4149, -27.8573, 154.0858],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [155.4149, -27.8573, 154.0858, 10],
+      "lump": {
+        "name": "Empty_95"
+      }
+    },
+
+    {
+      "trans": [-392.0117, 471.2457, -15.0763],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-392.0117, 471.2457, -15.0763, 10],
+      "lump": {
+        "name": "Empty_96"
+      }
+    },
+
+    {
+      "trans": [257.7987, 129.7789, -98.8399],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [257.7987, 129.7789, -98.8399, 10],
+      "lump": {
+        "name": "Empty_97"
+      }
+    },
+
+    {
+      "trans": [-118.6464, 616.7181, 61.4172],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-118.6464, 616.7181, 61.4172, 10],
+      "lump": {
+        "name": "Empty_98"
+      }
+    },
+
+    {
+      "trans": [-360.7599, 511.761, 320.7054],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-360.7599, 511.761, 320.7054, 10],
+      "lump": {
+        "name": "Empty_99"
+      }
+    },
+
+    {
+      "trans": [-419.4021, 144.4973, 14.6967],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-419.4021, 144.4973, 14.6967, 10],
+      "lump": {
+        "name": "Empty_100"
+      }
+    },
+
+    {
+      "trans": [2.7724, 253.9518, 343.8695],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [2.7724, 253.9518, 343.8695, 10],
+      "lump": {
+        "name": "Empty_101"
+      }
+    },
+
+    {
+      "trans": [-349.6021, 129.5055, -22.0734],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-349.6021, 129.5055, -22.0734, 10],
+      "lump": {
+        "name": "Empty_102"
+      }
+    },
+
+    {
+      "trans": [-403.9142, 9.264, 297.0461],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-403.9142, 9.264, 297.0461, 10],
+      "lump": {
+        "name": "Empty_103"
+      }
+    },
+
+    {
+      "trans": [-116.414, 297.479, -126.6873],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-116.414, 297.479, -126.6873, 10],
+      "lump": {
+        "name": "Empty_104"
+      }
+    },
+
+    {
+      "trans": [-251.1242, 318.5593, 345.8678],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-251.1242, 318.5593, 345.8678, 10],
+      "lump": {
+        "name": "Empty_105"
+      }
+    },
+
+    {
+      "trans": [-395.2029, 197.1701, 343.0927],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-395.2029, 197.1701, 343.0927, 10],
+      "lump": {
+        "name": "Empty_106"
+      }
+    },
+
+    {
+      "trans": [147.4546, 32.0783, 277.8477],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [147.4546, 32.0783, 277.8477, 10],
+      "lump": {
+        "name": "Empty_107"
+      }
+    },
+
+    {
+      "trans": [-121.0167, 634.7474, 10.6359],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-121.0167, 634.7474, 10.6359, 10],
+      "lump": {
+        "name": "Empty_108"
+      }
+    },
+
+    {
+      "trans": [256.2095, 327.4571, -160.3606],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [256.2095, 327.4571, -160.3606, 10],
+      "lump": {
+        "name": "Empty_109"
+      }
+    },
+
+    {
+      "trans": [160.9173, 447.1624, -251.0998],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [160.9173, 447.1624, -251.0998, 10],
+      "lump": {
+        "name": "Empty_110"
+      }
+    },
+
+    {
+      "trans": [120.5258, 480.7345, 341.2845],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [120.5258, 480.7345, 341.2845, 10],
+      "lump": {
+        "name": "Empty_111"
+      }
+    },
+
+    {
+      "trans": [103.9148, 289.6572, 137.511],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [103.9148, 289.6572, 137.511, 10],
+      "lump": {
+        "name": "Empty_112"
+      }
+    },
+
+    {
+      "trans": [-55.1166, -4.6833, 315.8557],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-55.1166, -4.6833, 315.8557, 10],
+      "lump": {
+        "name": "Empty_113"
+      }
+    },
+
+    {
+      "trans": [153.5915, -0.589, 20.3475],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [153.5915, -0.589, 20.3475, 10],
+      "lump": {
+        "name": "Empty_114"
+      }
+    },
+
+    {
+      "trans": [-308.1987, -45.08, -257.9923],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-308.1987, -45.08, -257.9923, 10],
+      "lump": {
+        "name": "Empty_115"
+      }
+    },
+
+    {
+      "trans": [55.1245, 664.9174, -197.7617],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [55.1245, 664.9174, -197.7617, 10],
+      "lump": {
+        "name": "Empty_116"
+      }
+    },
+
+    {
+      "trans": [-296.6943, 454.7055, -164.8041],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-296.6943, 454.7055, -164.8041, 10],
+      "lump": {
+        "name": "Empty_117"
+      }
+    },
+
+    {
+      "trans": [-348.2202, 227.4603, -201.7602],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-348.2202, 227.4603, -201.7602, 10],
+      "lump": {
+        "name": "Empty_118"
+      }
+    },
+
+    {
+      "trans": [-467.4736, 43.1739, 84.4326],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-467.4736, 43.1739, 84.4326, 10],
+      "lump": {
+        "name": "Empty_119"
+      }
+    },
+
+    {
+      "trans": [-444.3327, 292.6654, -101.6134],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-444.3327, 292.6654, -101.6134, 10],
+      "lump": {
+        "name": "Empty_120"
+      }
+    },
+
+    {
+      "trans": [266.8579, 324.0626, 199.2206],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [266.8579, 324.0626, 199.2206, 10],
+      "lump": {
+        "name": "Empty_121"
+      }
+    },
+
+    {
+      "trans": [-408.0173, 225.7718, -295.5017],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-408.0173, 225.7718, -295.5017, 10],
+      "lump": {
+        "name": "Empty_122"
+      }
+    },
+
+    {
+      "trans": [247.6429, 537.34, 143.0311],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [247.6429, 537.34, 143.0311, 10],
+      "lump": {
+        "name": "Empty_123"
+      }
+    },
+
+    {
+      "trans": [-381.6544, 269.49, -173.4176],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-381.6544, 269.49, -173.4176, 10],
+      "lump": {
+        "name": "Empty_124"
+      }
+    },
+
+    {
+      "trans": [104.5942, 131.6086, -48.9387],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [104.5942, 131.6086, -48.9387, 10],
+      "lump": {
+        "name": "Empty_125"
+      }
+    },
+
+    {
+      "trans": [-236.0338, 314.1042, -283.3809],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-236.0338, 314.1042, -283.3809, 10],
+      "lump": {
+        "name": "Empty_126"
+      }
+    },
+
+    {
+      "trans": [187.9237, 27.4583, 131.0201],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [187.9237, 27.4583, 131.0201, 10],
+      "lump": {
+        "name": "Empty_127"
+      }
+    },
+
+    {
+      "trans": [-358.2241, 680.2763, 326.6125],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-358.2241, 680.2763, 326.6125, 10],
+      "lump": {
+        "name": "Empty_128"
+      }
+    },
+
+    {
+      "trans": [-275.2752, 530.0983, -240.2691],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-275.2752, 530.0983, -240.2691, 10],
+      "lump": {
+        "name": "Empty_129"
+      }
+    },
+
+    {
+      "trans": [-184.2104, 349.7617, 149.5811],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-184.2104, 349.7617, 149.5811, 10],
+      "lump": {
+        "name": "Empty_130"
+      }
+    },
+
+    {
+      "trans": [217.8433, 302.2581, -132.4975],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [217.8433, 302.2581, -132.4975, 10],
+      "lump": {
+        "name": "Empty_131"
+      }
+    },
+
+    {
+      "trans": [-248.0334, 301.5043, -299.4586],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-248.0334, 301.5043, -299.4586, 10],
+      "lump": {
+        "name": "Empty_132"
+      }
+    },
+
+    {
+      "trans": [67.7646, 558.5857, 123.7095],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [67.7646, 558.5857, 123.7095, 10],
+      "lump": {
+        "name": "Empty_133"
+      }
+    },
+
+    {
+      "trans": [21.8958, 439.7499, -229.8593],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [21.8958, 439.7499, -229.8593, 10],
+      "lump": {
+        "name": "Empty_134"
+      }
+    },
+
+    {
+      "trans": [-116.5152, 635.0748, 168.4186],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-116.5152, 635.0748, 168.4186, 10],
+      "lump": {
+        "name": "Empty_135"
+      }
+    },
+
+    {
+      "trans": [-402.5541, 266.3362, -291.929],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-402.5541, 266.3362, -291.929, 10],
+      "lump": {
+        "name": "Empty_136"
+      }
+    },
+
+    {
+      "trans": [-207.4626, 180.5119, -110.0137],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-207.4626, 180.5119, -110.0137, 10],
+      "lump": {
+        "name": "Empty_137"
+      }
+    },
+
+    {
+      "trans": [216.3688, 36.575, -137.851],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [216.3688, 36.575, -137.851, 10],
+      "lump": {
+        "name": "Empty_138"
+      }
+    },
+
+    {
+      "trans": [-172.0729, 648.8223, 387.3962],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-172.0729, 648.8223, 387.3962, 10],
+      "lump": {
+        "name": "Empty_139"
+      }
+    },
+
+    {
+      "trans": [-168.837, 28.4884, 378.8157],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-168.837, 28.4884, 378.8157, 10],
+      "lump": {
+        "name": "Empty_140"
+      }
+    },
+
+    {
+      "trans": [129.721, 456.1653, 215.247],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [129.721, 456.1653, 215.247, 10],
+      "lump": {
+        "name": "Empty_141"
+      }
+    },
+
+    {
+      "trans": [-99.9972, 430.0977, 28.8512],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-99.9972, 430.0977, 28.8512, 10],
+      "lump": {
+        "name": "Empty_142"
+      }
+    },
+
+    {
+      "trans": [-310.7873, 419.4676, 326.2878],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-310.7873, 419.4676, 326.2878, 10],
+      "lump": {
+        "name": "Empty_143"
+      }
+    },
+
+    {
+      "trans": [166.8604, 679.4045, 391.2449],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [166.8604, 679.4045, 391.2449, 10],
+      "lump": {
+        "name": "Empty_144"
+      }
+    },
+
+    {
+      "trans": [-371.7713, 51.062, -14.5097],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-371.7713, 51.062, -14.5097, 10],
+      "lump": {
+        "name": "Empty_145"
+      }
+    },
+
+    {
+      "trans": [-234.094, 354.3813, 78.6473],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-234.094, 354.3813, 78.6473, 10],
+      "lump": {
+        "name": "Empty_146"
+      }
+    },
+
+    {
+      "trans": [63.4487, 665.3828, -189.9969],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [63.4487, 665.3828, -189.9969, 10],
+      "lump": {
+        "name": "Empty_147"
+      }
+    },
+
+    {
+      "trans": [-125.3812, 639.0668, 320.5881],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-125.3812, 639.0668, 320.5881, 10],
+      "lump": {
+        "name": "Empty_148"
+      }
+    },
+
+    {
+      "trans": [-369.6327, 232.6938, 219.0654],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-369.6327, 232.6938, 219.0654, 10],
+      "lump": {
+        "name": "Empty_149"
+      }
+    },
+
+    {
+      "trans": [-86.6979, 408.9558, 45.1605],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-86.6979, 408.9558, 45.1605, 10],
+      "lump": {
+        "name": "Empty_150"
+      }
+    },
+
+    {
+      "trans": [-389.244, 157.923, 91.6776],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-389.244, 157.923, 91.6776, 10],
+      "lump": {
+        "name": "Empty_151"
+      }
+    },
+
+    {
+      "trans": [131.1155, 617.5544, -22.6269],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [131.1155, 617.5544, -22.6269, 10],
+      "lump": {
+        "name": "Empty_152"
+      }
+    },
+
+    {
+      "trans": [221.4059, 473.8993, 152.7061],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [221.4059, 473.8993, 152.7061, 10],
+      "lump": {
+        "name": "Empty_153"
+      }
+    },
+
+    {
+      "trans": [-214.9522, 485.6701, -210.2068],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-214.9522, 485.6701, -210.2068, 10],
+      "lump": {
+        "name": "Empty_154"
+      }
+    },
+
+    {
+      "trans": [-59.6277, 202.4441, 14.26],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-59.6277, 202.4441, 14.26, 10],
+      "lump": {
+        "name": "Empty_155"
+      }
+    },
+
+    {
+      "trans": [-283.0973, 288.058, 37.196],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-283.0973, 288.058, 37.196, 10],
+      "lump": {
+        "name": "Empty_156"
+      }
+    },
+
+    {
+      "trans": [-249.4848, 131.9632, -44.1048],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-249.4848, 131.9632, -44.1048, 10],
+      "lump": {
+        "name": "Empty_157"
+      }
+    },
+
+    {
+      "trans": [-110.6694, 372.7948, 187.7355],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-110.6694, 372.7948, 187.7355, 10],
+      "lump": {
+        "name": "Empty_158"
+      }
+    },
+
+    {
+      "trans": [139.5498, 426.9886, 307.631],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [139.5498, 426.9886, 307.631, 10],
+      "lump": {
+        "name": "Empty_159"
+      }
+    },
+
+    {
+      "trans": [59.7812, 251.8031, 288.9595],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [59.7812, 251.8031, 288.9595, 10],
+      "lump": {
+        "name": "Empty_160"
+      }
+    },
+
+    {
+      "trans": [148.611, 482.7826, -224.9306],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [148.611, 482.7826, -224.9306, 10],
+      "lump": {
+        "name": "Empty_161"
+      }
+    },
+
+    {
+      "trans": [-346.1023, 625.6607, 343.6696],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-346.1023, 625.6607, 343.6696, 10],
+      "lump": {
+        "name": "Empty_162"
+      }
+    },
+
+    {
+      "trans": [-152.5568, 518.5844, -265.7342],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-152.5568, 518.5844, -265.7342, 10],
+      "lump": {
+        "name": "Empty_163"
+      }
+    },
+
+    {
+      "trans": [-307.6378, 211.4967, -88.6171],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-307.6378, 211.4967, -88.6171, 10],
+      "lump": {
+        "name": "Empty_164"
+      }
+    },
+
+    {
+      "trans": [-184.3897, 99.6279, 102.877],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-184.3897, 99.6279, 102.877, 10],
+      "lump": {
+        "name": "Empty_165"
+      }
+    },
+
+    {
+      "trans": [-50.6913, 240.3442, -159.93],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-50.6913, 240.3442, -159.93, 10],
+      "lump": {
+        "name": "Empty_166"
+      }
+    },
+
+    {
+      "trans": [-259.4344, 620.291, -220.741],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-259.4344, 620.291, -220.741, 10],
+      "lump": {
+        "name": "Empty_167"
+      }
+    },
+
+    {
+      "trans": [-349.2614, 668.9493, -155.9991],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-349.2614, 668.9493, -155.9991, 10],
+      "lump": {
+        "name": "Empty_168"
+      }
+    },
+
+    {
+      "trans": [256.6259, 335.4142, 175.9399],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [256.6259, 335.4142, 175.9399, 10],
+      "lump": {
+        "name": "Empty_169"
+      }
+    },
+
+    {
+      "trans": [-161.2336, 380.7671, 95.8226],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-161.2336, 380.7671, 95.8226, 10],
+      "lump": {
+        "name": "Empty_170"
+      }
+    },
+
+    {
+      "trans": [-463.6624, 656.7493, -244.8927],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-463.6624, 656.7493, -244.8927, 10],
+      "lump": {
+        "name": "Empty_171"
+      }
+    },
+
+    {
+      "trans": [250.8793, 169.0399, -235.8479],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [250.8793, 169.0399, -235.8479, 10],
+      "lump": {
+        "name": "Empty_172"
+      }
+    },
+
+    {
+      "trans": [-236.419, 262.8578, -235.1504],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-236.419, 262.8578, -235.1504, 10],
+      "lump": {
+        "name": "Empty_173"
+      }
+    },
+
+    {
+      "trans": [144.7675, 8.7113, 202.7119],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [144.7675, 8.7113, 202.7119, 10],
+      "lump": {
+        "name": "Empty_174"
+      }
+    },
+
+    {
+      "trans": [-298.1164, 514.309, 122.6386],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-298.1164, 514.309, 122.6386, 10],
+      "lump": {
+        "name": "Empty_175"
+      }
+    },
+
+    {
+      "trans": [82.5058, 196.406, -313.7075],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [82.5058, 196.406, -313.7075, 10],
+      "lump": {
+        "name": "Empty_176"
+      }
+    },
+
+    {
+      "trans": [-46.7564, 411.0579, -45.7189],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-46.7564, 411.0579, -45.7189, 10],
+      "lump": {
+        "name": "Empty_177"
+      }
+    },
+
+    {
+      "trans": [73.4228, 405.9852, 112.1681],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [73.4228, 405.9852, 112.1681, 10],
+      "lump": {
+        "name": "Empty_178"
+      }
+    },
+
+    {
+      "trans": [-27.332, 237.9385, -47.7625],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-27.332, 237.9385, -47.7625, 10],
+      "lump": {
+        "name": "Empty_179"
+      }
+    },
+
+    {
+      "trans": [136.9609, 534.0848, -199.2954],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [136.9609, 534.0848, -199.2954, 10],
+      "lump": {
+        "name": "Empty_180"
+      }
+    },
+
+    {
+      "trans": [-436.2644, 180.64, -199.0688],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-436.2644, 180.64, -199.0688, 10],
+      "lump": {
+        "name": "Empty_181"
+      }
+    },
+
+    {
+      "trans": [-144.7871, 384.5462, 274.9373],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-144.7871, 384.5462, 274.9373, 10],
+      "lump": {
+        "name": "Empty_182"
+      }
+    },
+
+    {
+      "trans": [-237.446, 328.4053, 61.8615],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-237.446, 328.4053, 61.8615, 10],
+      "lump": {
+        "name": "Empty_183"
+      }
+    },
+
+    {
+      "trans": [-45.1606, 507.1458, 91.9114],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-45.1606, 507.1458, 91.9114, 10],
+      "lump": {
+        "name": "Empty_184"
+      }
+    },
+
+    {
+      "trans": [214.9442, 537.1351, 313.6444],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [214.9442, 537.1351, 313.6444, 10],
+      "lump": {
+        "name": "Empty_185"
+      }
+    },
+
+    {
+      "trans": [-303.2214, 279.3734, -81.102],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-303.2214, 279.3734, -81.102, 10],
+      "lump": {
+        "name": "Empty_186"
+      }
+    },
+
+    {
+      "trans": [-165.2322, 196.373, 335.6619],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-165.2322, 196.373, 335.6619, 10],
+      "lump": {
+        "name": "Empty_187"
+      }
+    },
+
+    {
+      "trans": [134.1017, 344.5891, 355.7975],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [134.1017, 344.5891, 355.7975, 10],
+      "lump": {
+        "name": "Empty_188"
+      }
+    },
+
+    {
+      "trans": [-359.54, 181.3868, -254.8645],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [-359.54, 181.3868, -254.8645, 10],
+      "lump": {
+        "name": "Empty_189"
+      }
+    },
+
+    {
+      "trans": [263.5319, 573.5867, 388.2654],
+      "etype": "block-game",
+      "game_task": 0,
+      "quat" : [0.0, 0.0, -0.0, 1.0],
+      "bsphere": [263.5319, 573.5867, 388.2654, 10],
+      "lump": {
+        "name": "Empty_190"
       }
     }
-  ],
-
-  "actors": [
-    {
-      "trans": [-21.6238, 20.0496, 17.1191], // translation
-      "etype": "fuel-cell", // actor type
-      "game_task": "(game-task none)", // associated game task (for powercells, etc)
-      "quat": [0, 0, 0, 1], // quaternion
-      "bsphere": [-21.6238, 19.3496, 17.1191, 10], // bounding sphere
-      "lump": {
-        "name": "test-fuel-cell",
-        "eco-info": ["cell-info", "(game-task none)"]
-      }
-    },
-
-    {
-      "trans": [-15.2818, 15.2461, 17.136], // translation
-      "etype": "crate", // actor type
-      "game_task": "(game-task none)", // associated game task (for powercells, etc)
-      "quat": [0, 0, 0, 1], // quaternion
-      "bsphere": [-15.2818, 15.2461, 17.136, 10], // bounding sphere
-      "lump": {
-        "name": "test-crate",
-        "crate-type": "'steel",
-        "eco-info": ["eco-info", "(pickup-type money)", 10]
-      }
-    },
-
-    {
-      "trans": [-5.463, 17.4553, 1.6169], // translation
-      "etype": "eco-yellow", // actor type
-      "game_task": "(game-task none)", // associated game task (for powercells, etc)
-      "quat": [0, 0, 0, 1], // quaternion
-      "bsphere": [-5.463, 17.4553, 1.6169, 10], // bounding sphere
-      "lump": {
-        "name": "test-eco"
-      }
-    },
-    {
-      "trans": [-7.3159, 1.0468, 20.3499],
-      "etype": "babak",
-      "game_task": 0,
-      "quat" : [0, 0, 0, 1],
-      "bsphere": [-7.3159, 1.0468, 20.3499, 10],
-      "lump": {
-        "name": "test-babak",
-        "vis-dist": ["meters", 200.0],
-        "cam-notice-dist": ["meters", 30.0],
-        "idle-distance": ["meters", 50.0],
-        "cam-vert": ["meters", 8.0],
-        "cam-horz": ["meters", 20.0],
-        "path": ["vector3m", // I am pretty sure game will crash if there is no path for an enemy. So just add one. You can use "path-actor" if you want to use another actor's path.
-            [-7.3159, 1.0468, 20.3499],
-            [-2.3607, 1.0468, 12.8255],
-            [-9.7266, 1.0468, 14.4445],
-            [-7.3159, 1.0468, 20.3499]
-          ],
-        "nav-mesh-sphere": ["vector4m", // You can define spheres that will be added to the navmesh of the enemy. Enemies of the navmesh will avoid these spheres - like they avoid each other.
-          [-5.3159, 1.0468, 16.3499, 1.0]
-          ]
-      }
-    },
-    {
-      "trans": [-5.41, 3.5, 28.42], // translation
-      "etype": "test-actor", // actor type
-      "game_task": 0, // associated game task (for powercells, etc)
-      "quat": [0, 0, 0, 1], // quaternion
-      "bsphere": [-7.41, 3.5, 28.42, 10], // bounding sphere
-      "lump": {
-        "name": "test-actor"
-      }
-    },
-
-    {
-      "trans": [0.0, 50.0, 10.0],
-      "etype": "linear-plat",
-      "game_task": 0,
-      "quat": [0, 0, 0, 1],
-      "bsphere": [0.0, 50.0, 10.0, 10],
-      "lump": {
-        "name": "linear-plat-0",
-        "path": ["vector4m",
-          [0.0, 50.0, 10.0, 1.0],
-          [0.0, 50.0, 10.0, 1.0],
-          [0.0, 60.0, 10.0, 1.0],
-          [0.0, 50.0, 10.0, 1.0],
-          [0.0, 50.0, 10.0, 1.0],
-          [0.0, 60.0, 10.0, 1.0],
-          [0.0, 50.0, 10.0, 1.0]
-          ],
-        "timings": ["float",
-          0.0, // offset before starting
-          2.0, // down to up (out)
-          2.0, // up to down (out)
-          6.0, // stay down
-          2.0, // down to up (back)
-          2.0, // up to down (back)
-          0.0 // immediately start back up
-          ],
-        "sync": ["float", 14, 0.0]
-      }
-    },
-
-    {
-      "trans": [0.0, 50.0, 17.0],
-      "etype": "linear-plat",
-      "game_task": 0,
-      "quat": [0, 0, 0, 1],
-      "bsphere": [0.0, 50.0, 17.0, 10],
-      "lump": {
-        "name": "linear-plat-1",
-        "path": ["vector4m",
-          [0.0, 50.0, 17.0, 1.0],
-          [0.0, 50.0, 17.0, 1.0],
-          [0.0, 60.0, 17.0, 1.0],
-          [0.0, 50.0, 17.0, 1.0],
-          [0.0, 50.0, 17.0, 1.0],
-          [0.0, 60.0, 17.0, 1.0],
-          [0.0, 50.0, 17.0, 1.0]
-        ],
-        "timings": ["float",
-          1.0, // offset before starting
-          2.0, // down to up (out)
-          2.0, // up to down (out)
-          4.0, // stay down
-          2.0, // down to up (back)
-          2.0, // up to down (back)
-          1.0 // immediately start back up
-          ],
-        "sync": ["float", 14, 0.0]
-      }
-    },
-
-    {
-      "trans": [0.0, 50.0, 24.0],
-      "etype": "linear-plat",
-      "game_task": 0,
-      "quat": [0, 0, 0, 1],
-      "bsphere": [0.0, 50.0, 24.0, 10],
-      "lump": {
-        "name": "linear-plat-2",
-        "path": ["vector4m",
-          [0.0, 50.0, 24.0, 1.0],
-          [0.0, 50.0, 24.0, 1.0],
-          [0.0, 60.0, 24.0, 1.0],
-          [0.0, 50.0, 24.0, 1.0],
-          [0.0, 50.0, 24.0, 1.0],
-          [0.0, 60.0, 24.0, 1.0],
-          [0.0, 50.0, 24.0, 1.0]
-          ],
-        "timings": ["float",
-          2.0, // offset before starting
-          2.0, // down to up (out)
-          2.0, // up to down (out)
-          2.0, // stay down
-          2.0, // down to up (back)
-          2.0, // up to down (back)
-          2.0 // immediately start back up
-          ],
-        "sync": ["float", 14, 0.0]
-      }
-    },
-
-    {
-      "trans": [0.0, 50.0, 31.0],
-      "etype": "linear-plat",
-      "game_task": 0,
-      "quat": [0, 0, 0, 1],
-      "bsphere": [0.0, 50.0, 31.0, 10],
-      "lump": {
-        "name": "linear-plat-3",
-        "path": ["vector4m",
-          [0.0, 50.0, 31.0, 1.0],
-          [0.0, 50.0, 31.0, 1.0],
-          [0.0, 60.0, 31.0, 1.0],
-          [0.0, 50.0, 31.0, 1.0],
-          [0.0, 50.0, 31.0, 1.0],
-          [0.0, 60.0, 31.0, 1.0],
-          [0.0, 50.0, 31.0, 1.0]
-        ],
-        "timings": ["float",
-          3.0, // offset before starting
-          2.0, // down to up (out)
-          2.0, // up to down (out)
-          0.0, // stay down
-          2.0, // down to up (back)
-          2.0, // up to down (back)
-          0.0 // immediately start back up
-          ],
-        "sync": ["float", 14, 0.0]
-      }
-    }
-
   ]
 }
