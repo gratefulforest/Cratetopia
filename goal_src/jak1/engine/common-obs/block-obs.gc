@@ -499,7 +499,7 @@
           (when (< count-x 10)
             (dotimes (x 10)
               (shift-down (+ y x) clears #f)))))
-        (set! (-> self lines) (+ (-> self lines) 2))
+        (set! (-> self lines) (+ (-> self lines) clears))
         (when (= look 9)
           (dotimes (count 200)
             (let ((proc (get-block (- 199 count))))
