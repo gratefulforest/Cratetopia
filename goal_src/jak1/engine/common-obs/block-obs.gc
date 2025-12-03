@@ -520,7 +520,6 @@
   (none))
 
 (defbehavior block-game-init block-game ((this block-game))
-  (stack-size-set! (-> this main-thread) 1024)
   (set! (-> this root) (new 'process 'trsqv))
   (set! (-> this level) (the int (the-as float (-> *progress-carousell* int-backup))))
   (set! (-> this score) 0)
@@ -537,6 +536,7 @@
   (none))
 
 (defbehavior block-game-init-by-other block-game ()
+  (stack-size-set! (-> self main-thread) 1024)
   (block-game-init self)
   (set! (-> self title) #f)
   (set! (-> *time-of-day-proc* 0 time-ratio) 0.0)
@@ -675,3 +675,4 @@
 (defun spawn-block-game ()
   (process-spawn block-game :name "block-game-entity" :to *entity-pool*)
   (none))
+
