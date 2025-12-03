@@ -536,7 +536,7 @@
   (none))
 
 (defbehavior block-game-init-by-other block-game ()
-  (stack-size-set! (-> this main-thread) 1024)
+  (stack-size-set! (-> self main-thread) 1024)
   (block-game-init self)
   (set! (-> self title) #f)
   (set! (-> *time-of-day-proc* 0 time-ratio) 0.0)
@@ -675,4 +675,5 @@
 (defun spawn-block-game ()
   (process-spawn block-game :name "block-game-entity" :to *entity-pool*)
   (none))
+
 
