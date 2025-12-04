@@ -11221,7 +11221,7 @@
 
 (set! (-> *ocean-map-village1* ocean-mid-indices) *ocean-mid-indices-village1*)
 
-(set! (-> *ocean-map-village1* ocean-trans-indices) *ocean-trans-indices-village1*)
+(set! (-> *ocean-map-village1* ocean-trans-indices) *ocean-trans-indices-sunken*)
 
 (set! (-> *ocean-map-village1* ocean-near-indices) *ocean-near-indices-village1*)
 
