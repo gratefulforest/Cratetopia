@@ -1017,11 +1017,11 @@
   (format 0 "*kernel-boot-message*: ~A~%" *kernel-boot-message*)
   ;;(kernel-shutdown)
   ;; og:mod-base use custom continue point
-  (let* ((debug-cont (if (and *debug-segment* (nonzero? *debug-continue-point*)) (get-continue-by-name *game-info* *debug-continue-point*)))
+  (let* ((debug-cont (if (and *debug-segment* (not *retail-but-debug*) (nonzero? *debug-continue-point*)) (get-continue-by-name *game-info* *debug-continue-point*)))
          (startup-level (if debug-cont
                           (-> debug-cont level)
                           (case *kernel-boot-message*
-                            (('play) (if *debug-segment* 'village1 'title))
+                            (('play) (if (and *debug-segment* (not *retail-but-debug*)) 'beach 'title))
                             (else 'demo)))))
     (stop 'play)
     (set! (-> *level* vis?) use-vis)
@@ -1058,7 +1058,7 @@
     (initialize! *game-info*
                  'game
                  (the-as game-save #f)
-                 (if (and *debug-segment* (nonzero? *debug-continue-point*)) *debug-continue-point* (the string #f))))
+                 (if (and *debug-segment* (not *retail-but-debug*) (nonzero? *debug-continue-point*)) *debug-continue-point* (the string #f))))
   0)
 
 (defun update-sound-banks ()

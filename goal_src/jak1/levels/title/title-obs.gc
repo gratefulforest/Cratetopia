@@ -323,20 +323,22 @@
       ;; og:preserve-this
       (if (and (or *debug-segment* PC_PORT)
                (cpad-pressed? 0 start circle x)
-               (member (level-status *level* 'village1) '(loaded active)))
+               (member (level-status *level* 'test-zone) '(loaded active)))
         (set-setting! 'bg-a 'abs 1.0 0))
       (when (and (= (-> *setting-control* current bg-a) 1.0)
-                 (and (member (level-status *level* 'village1) '(active loaded))
+                 (and (member (level-status *level* 'test-zone) '(active loaded))
                       ;; og:preserve-this i think we can forgo the time check here...
                       (#if PC_PORT #t (>= (- (-> *display* base-frame-counter) (-> self state-time)) (seconds 3)))
-                      (let ((gp-2 (level-get *level* 'village1)))
+                      (let ((gp-2 (level-get *level* 'test-zone)))
                         (when gp-2
-                          (load-state-want-levels 'title 'village1)
-                          (load-state-want-display-level 'village1 'display-self)
-                          (load-state-want-vis 'vi1)
-                          (set-force-inside! *load-state* 'village1 #t)
-                          (!= (-> gp-2 all-visible?) 'loading)))))
-        (load-state-want-display-level 'village1 'special)
+                          (load-state-want-levels 'title 'test-zone)
+                          (load-state-want-display-level 'test-zone 'display-self)
+                          (load-state-want-vis 'tsz)
+                          (set-force-inside! *load-state* 'test-zone #t)
+                          ;; this will never be true for test-zone since custom levels don't have vis data, just skip it
+                          ;; (!= (-> gp-2 all-visible?) 'loading)
+                          ))))
+        (load-state-want-display-level 'test-zone 'special)
         (if (not (-> self done?)) (ja-abort-spooled-anim (-> self anim) (the-as art-joint-anim #f) -1))
         (set! (-> self done?) #t)
         (deactivate self))
@@ -430,9 +432,9 @@
                 :index 3
                 :parts 4
                 :command-list
-                '((0 want-levels title village1)
-                 (5 want-vis vi1)
-                 (5 want-force-inside village1 #t)
+                '((0 want-levels title test-zone)
+                 (5 want-vis tsz)
+                 (5 want-force-inside test-zone #t)
                  (6 save)
                  (453 send-event self blackout))))))
   (logior! (-> self skel status) (janim-status inited))

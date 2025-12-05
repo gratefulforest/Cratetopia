@@ -772,7 +772,7 @@
             :slider-step-size 0.25
             :on-confirm
             (lambda ()
-              (initialize! *game-info* 'game (the-as game-save #f) "village1-hut")))
+              (initialize! *game-info* 'game (the-as game-save #f) "beach-jungle-start")))
        (new 'static
             'game-option
             :option-type (game-option-type menu)
