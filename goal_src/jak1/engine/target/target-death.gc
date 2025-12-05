@@ -32,6 +32,7 @@
                   (set! a1-0 (car a0-1))))
               #f))))
 
+(define-extern spawn-block-game (function none))
 (defstate target-continue (target)
   :event target-generic-event-handler
   :exit
@@ -143,6 +144,9 @@
             (suspend))))
       (set! *spawn-actors* #t)
       (set! *teleport* #t)
+      ;; continue point levels are good, see if we should spawn block-game
+      (when (and (!= (-> arg0 lev0) 'title) (!= (-> arg0 lev1) 'title))
+        (spawn-block-game))
       (set! (-> *ACTOR-bank* birth-max) 1000)
       (set-blackout-frames (seconds 0.1))
       (cond

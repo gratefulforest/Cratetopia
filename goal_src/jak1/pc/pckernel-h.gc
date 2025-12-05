@@ -272,6 +272,9 @@
 
 (define *display-sha* *debug-segment*)
 
+;; set this to #t to boot to ndi intro + title screen like retail mode, even in debug mode
+(define *retail-but-debug* #f)
+
 ;; collision renderer things. debug only.
 (define *collision-renderer* #f)
 

@@ -125,7 +125,7 @@
           (logclear! (-> *setting-control* default process-mask) (process-mask menu))
           ;; activate the progress menu.
           (when (not *progress-process*)
-            (activate-progress *dproc* (progress-screen fuel-cell))
+            (activate-progress *dproc* (progress-screen title)) ;; jump to title instead of (progress-screen fuel-cell))
             (if (not *progress-process*) (set-master-mode 'game))))
          (('game)
           ;; allow pausable/menu to run.
@@ -349,8 +349,6 @@
           ))))
   0)
 
-(define-extern spawn-block-game (function none))
-
 (defbehavior display-loop process ()
   "the main 'display loop' in GOAL. v-sync is done in this function, so all frames start and end here."
   ;; increase our stack size.
@@ -372,8 +370,13 @@
     (suspend)
     (while *run*
       (runs-every-frame) ;; trigger hook for mod base mod-base-change entry point
-      (when (and (!= (-> *load-state* want 0 name) 'title) (not (process-by-name "block-game-entity" *active-pool*)))
-        (spawn-block-game))
+      ;; pause/resume any custom music
+      (case *master-mode*
+        (('pause 'menu 'progress)
+          (pause-main-music))
+        (else
+          (resume-main-music))
+        )
       ;; start immediately after all process updates finish.
       (profiler-instant-event "display-loop-top")
       ;; drawing effects to be used in foreground drawing.
