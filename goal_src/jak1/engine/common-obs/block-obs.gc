@@ -203,7 +203,6 @@
    (next    int)
    (x       int)
    (y       int)
-   (volume  int)
    (level   int)
    (loaded  symbol)
    (lines   int)
@@ -361,12 +360,13 @@
       (set-force-inside! *load-state* wanted #t)
       (load-state-want-levels first second)
       (move-field)
-      (case wanted
-        (('beach) (play-main-music "beach.wav" (-> self volume)))
-        (('jungle) (play-main-music "jungle.wav" (-> self volume)))
-        (('firecanyon) (play-main-music "firecanyon.wav" (-> self volume)))
-        (('sunken) (play-main-music "sunken.wav" (-> self volume)))
-        (('snow) (play-main-music "snow.wav" (-> self volume)))))
+      (let ((volume (the int (* (-> *setting-control* default music-volume) 1.5))))
+        (case wanted
+          (('beach) (play-main-music "beach.wav" volume))
+          (('jungle) (play-main-music "jungle.wav" volume))
+          (('firecanyon) (play-main-music "firecanyon.wav" volume))
+          (('sunken) (play-main-music "sunken.wav" volume))
+          (('snow) (play-main-music "snow.wav" volume)))))
     (when (> (mod (-> self lines) 10) 6)
       (when (= extra 'jungle)
         (clean-level-actor 'crate-11)
@@ -459,9 +459,9 @@
   (set! clears (+ (* clears 10) (-> self extras)))
   (let ((fraction 0))
     (cond
-      ((>= clears 40) (set! fraction 120))
-      ((>= clears 30) (set! fraction 30))
-      ((>= clears 20) (set! fraction 10))
+      ((>= clears 40) (set! fraction 30))
+      ((>= clears 30) (set! fraction 10))
+      ((>= clears 20) (set! fraction 5))
       ((>= clears 10) (set! fraction 4)))
     (set! (-> self score) (+ (-> self score) (* (* fraction clears) (+ (-> self level) 1))))
     (set! (-> self extras) 0))
@@ -541,7 +541,6 @@
   (set! (-> self title) #f)
   (set! (-> *time-of-day-proc* 0 time-ratio) 0.0)
   (logior! (-> *target* draw status) (draw-status hidden))
-  (set! (-> self volume) (the int (* (-> *setting-control* default music-volume) 1.5)))
   (set! (-> *setting-control* default music-volume) 0.0)
   (let ((proc (process-spawn block-camera :init pov-camera-init-by-other (-> self root trans) *block-game-sg* "idle" 0 self '()
     :name "block-camera-entity" :to *entity-pool*)))
@@ -675,5 +674,6 @@
 (defun spawn-block-game ()
   (process-spawn block-game :name "block-game-entity" :to *entity-pool*)
   (none))
+
 
 
