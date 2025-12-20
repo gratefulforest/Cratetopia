@@ -28,10 +28,10 @@
 
 (defun progress-allowed? ()
   (not (or (-> *setting-control* current talking)
-           (-> *setting-control* current movie)
+          ;;  (-> *setting-control* current movie)
            (movie?)
-           (handle->process (-> *game-info* pov-camera-handle))
-           (handle->process (-> *game-info* other-camera-handle))
+          ;;  (handle->process (-> *game-info* pov-camera-handle))
+          ;;  (handle->process (-> *game-info* other-camera-handle))
            (< (-> *display* base-frame-counter) (-> *game-info* letterbox-time))
            (< (-> *display* base-frame-counter) (-> *game-info* blackout-time))
            (!= (-> *setting-control* current bg-a) 0.0)

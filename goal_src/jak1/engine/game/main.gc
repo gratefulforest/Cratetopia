@@ -125,7 +125,7 @@
           (logclear! (-> *setting-control* default process-mask) (process-mask menu))
           ;; activate the progress menu.
           (when (not *progress-process*)
-            (activate-progress *dproc* (progress-screen fuel-cell))
+            (activate-progress *dproc* (progress-screen title)) ;; jump to title instead of (progress-screen fuel-cell))
             (if (not *progress-process*) (set-master-mode 'game))))
          (('game)
           ;; allow pausable/menu to run.
@@ -370,6 +370,13 @@
     (suspend)
     (while *run*
       (runs-every-frame) ;; trigger hook for mod base mod-base-change entry point
+      (set! (-> *pc-settings* ps2-actor-vis?) #f)
+      (case *master-mode*
+        (('pause 'menu 'progress)
+          (pause-main-music))
+        (else
+          (resume-main-music)
+          (main-music-volume (the int (* (-> *setting-control* default music-volume) 1.25)))))
       ;; start immediately after all process updates finish.
       (profiler-instant-event "display-loop-top")
       ;; drawing effects to be used in foreground drawing.
