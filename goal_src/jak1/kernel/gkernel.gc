@@ -771,7 +771,7 @@
 (defmethod get-process ((this dead-pool) (type-to-make type) (stack-size int))
   "Get a process from this dead pool of the given type."
   (let ((proc (-> this child)))
-    (when (and (not proc) *debug-segment* (neq? this *debug-dead-pool*))
+    (when (and (not proc) (neq? this *debug-dead-pool*))
       ;; we failed, but we're in debug mode and not looking at the debug pool
       ;; try again from the debug pool and warn if this works
       (set! proc (the (pointer process-tree) (get-process *debug-dead-pool* type-to-make stack-size)))
@@ -2010,7 +2010,7 @@
 (define *camera-master-dead-pool* (new 'global 'dead-pool 1 (* 8 1024) '*camera-master-dead-pool*))
 
 ;; used if other pools run out of space in debug mode
-(if *debug-segment* (define *debug-dead-pool* (new 'debug 'dead-pool-heap '*debug-dead-pool* 768 (* 1024 1024))))
+(define *debug-dead-pool* (new 'debug 'dead-pool-heap '*debug-dead-pool* 768 (* 1024 1024)))
 
 ;; variable sized actor pool (most actors go here)
 (define *nk-dead-pool* (new 'global 'dead-pool-heap '*nk-dead-pool* (* PROCESS_HEAP_MULT 768) PROCESS_HEAP_SIZE))
