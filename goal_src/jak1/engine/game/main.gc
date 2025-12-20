@@ -370,6 +370,7 @@
     (suspend)
     (while *run*
       (runs-every-frame) ;; trigger hook for mod base mod-base-change entry point
+      (set! (-> *pc-settings* subtitles?) #f)
       (set! (-> *pc-settings* ps2-actor-vis?) #f)
       (case *master-mode*
         (('pause 'menu 'progress)
