@@ -371,4 +371,7 @@
   ;; keep blocking-plane stuff loaded
   "blocking-plane.o"
   "ef-plane-ag.go"
+  "tntbarrel-ag.go"
+  "block-game-ag.go"
+  "block-obs.o"
  ))
