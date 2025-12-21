@@ -1019,7 +1019,7 @@
          (set! (-> this child) (&-> rec process))))
       (else
        ;; allocation failed! try again on the debug heap if we're debugging.
-       (when (and *debug-segment* (not (eq? this *debug-dead-pool*)))
+       (when (and (not (eq? this *debug-dead-pool*)))
          (set! proc (get-process *debug-dead-pool* type-to-make stack-size))
          (when (and proc *vis-boot*)
            (format 0
