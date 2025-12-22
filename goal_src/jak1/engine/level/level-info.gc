@@ -2354,7 +2354,7 @@
              :vis-nick 'tit
              :lev0 'title
              :disp0 'special
-             :lev1 'test-zone
+             :lev1 'village1
              :disp1 #f))
        :tasks
        '()
