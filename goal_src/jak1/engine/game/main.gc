@@ -371,7 +371,7 @@
     (while *run*
       (runs-every-frame) ;; trigger hook for mod base mod-base-change entry point
       (set! (-> *pc-settings* hinttitles?) #f)
-      (set! (-> *pc-settings* ps2-actor-vis?) #f)
+      (set! (-> *pc-settings* ps2-actor-vis?) #t)
       (case *master-mode*
         (('pause 'menu 'progress)
           (pause-main-music))
