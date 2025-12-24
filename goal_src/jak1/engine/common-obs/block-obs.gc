@@ -481,7 +481,7 @@
               (suspend-for (seconds 0.017)))))
         (when (and (= leftmost-id -100) (= rightmost-id -100))
           (dotimes (x 10)
-            (shift-down (+ y x) clears #f))))))
+            (shift-down (+ y x) clears #t))))))
   (none))
 
 (defbehavior award-score block-game ((clears int))
@@ -708,4 +708,5 @@
     (deactivate (process-by-name "block-game-entity" *active-pool*)))
   (process-spawn block-game (static-vectorm -198.0 40.0 -285.0) :name "block-game-entity" :to *entity-pool*)
   (none))
+
 
