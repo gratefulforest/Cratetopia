@@ -481,7 +481,7 @@
               (suspend-for (seconds 0.017)))))
         (when (and (= leftmost-id -100) (= rightmost-id -100))
           (dotimes (x 10)
-            (shift-down (+ y x) clears #t))))))
+            (shift-down (+ y x) clears #f))))))
   (none))
 
 (defbehavior award-score block-game ((clears int))
@@ -497,8 +497,6 @@
   (none))
 
 (defbehavior end-turn block-game ((look int))
-  (when (= look 8)
-    (yellow-effect))
   (for-block (-> self piece) (-> self x) (-> self y)
     (when (>= index 0)
       (set! (-> (-> self field) index) look)
@@ -506,6 +504,8 @@
     (when (< index 0)
       (send-event proc 'break))
     (set! (-> (the block proc) id) index))
+  (when (= look 8)
+    (yellow-effect))
   (when (= look 7)
     (red-effect))
   (let ((clears 0))
@@ -708,5 +708,6 @@
     (deactivate (process-by-name "block-game-entity" *active-pool*)))
   (process-spawn block-game (static-vectorm -198.0 40.0 -285.0) :name "block-game-entity" :to *entity-pool*)
   (none))
+
 
 
