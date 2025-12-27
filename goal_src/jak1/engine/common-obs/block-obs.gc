@@ -311,7 +311,7 @@
   (set! (-> self lost) #t)
   (dotimes (id 8)
     (send-event (get-block (- id 8)) 'lose)
-    (suspend-for (seconds 0.0333)))
+    (suspend-for (seconds 0.03)))
   (dotimes (index 200)
     (let ((proc (get-block index)))
       (when proc
@@ -724,3 +724,4 @@
     (deactivate (process-by-name "block-game-entity" *active-pool*)))
   (process-spawn block-game (static-vectorm -198.0 40.0 -285.0) :name "block-game-entity" :to *entity-pool*)
   (none))
+
