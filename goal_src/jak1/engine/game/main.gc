@@ -164,7 +164,7 @@
                             (cond
                               ;; debug mode pause allowed with select or R2.
                               ;; og:preserve-this allow select outside debug mode
-                              ((or (cpad-hold? 0 select) (and *debug-segment* (cpad-hold? 0 r2)))
+                              ((and *debug-segment* (cpad-hold? 0 r2))
                                ;; pushing select or R2, and debug. allow pause.
                                'pause)
                               (else
