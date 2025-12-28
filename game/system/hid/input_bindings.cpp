@@ -112,7 +112,7 @@ const InputBindingGroups DEFAULT_KEYBOARD_BINDS =
                         {SDLK_R, {InputBinding(PadData::ButtonIndex::TRIANGLE)}},
                         {SDLK_COMMA, {InputBinding(PadData::ButtonIndex::L3)}},
                         {SDLK_PERIOD, {InputBinding(PadData::ButtonIndex::R3)}},
-                        {SDLK_APOSTROPHE, {InputBinding(PadData::ButtonIndex::SELECT)}},
+                        {SDLK_LSHIFT, {InputBinding(PadData::ButtonIndex::SELECT)}},
                         {SDLK_RETURN, {InputBinding(PadData::ButtonIndex::START)}},
                         {SDLK_Q, {InputBinding(PadData::ButtonIndex::L1)}},
                         {SDLK_O, {InputBinding(PadData::ButtonIndex::R1)}},
