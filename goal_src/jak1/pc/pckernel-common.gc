@@ -190,7 +190,7 @@
   (when (not (-> obj use-vis?))
     (update-video-hacks obj))
   (cond
-    (#t
+    ((level-get *level* 'title)
      ;; kinda overkill.
      (set! (-> *ACTOR-bank* birth-dist) (meters 10000))
      (set! (-> *ACTOR-bank* pause-dist) (meters 10000))
