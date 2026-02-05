@@ -804,7 +804,12 @@
 
   (save-and-load-game #x3000)
 
-  (start-new-level #x3001)
+  (regular-game #x3001)
+  (plant-battle #x3002)
+  (citadel-drop #x3003)
+  (high-scores #x3004)
+  (guidelines #x3005)
+  (fisherman #x3006)
   ;; GAME-TEXT-ID ENUM ENDS
   )
 
