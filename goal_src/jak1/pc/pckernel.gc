@@ -444,6 +444,10 @@
     (("text-language") (set! (-> obj text-language) (the-as pc-language (file-stream-read-int file))))
     (("scenes-seen") (dotimes (i PC_SPOOL_LOG_LENGTH) (set! (-> obj scenes-seen i) (file-stream-read-int file))))
     (("memcard-play-hints?") (set! (-> obj memcard-play-hints?) (file-stream-read-symbol file)))
+    (("memcard-00") (set! (-> obj memcard-00) (file-stream-read-symbol file)))
+    (("memcard-01") (set! (-> obj memcard-01) (file-stream-read-int file)))
+    (("memcard-02") (set! (-> obj memcard-02) (file-stream-read-int file)))
+    (("memcard-03") (set! (-> obj memcard-03) (file-stream-read-int file)))
     (("secrets")
      (dosettings (file)
                  (case-str *pc-temp-string*
@@ -478,6 +482,10 @@
   (format file "  (subtitle-language ~D)~%" (-> obj subtitle-language))
   (format file "  (text-language ~D)~%" (-> obj text-language))
   (format file "  (memcard-play-hints? ~A)~%" (-> obj memcard-play-hints?))
+  (format file "  (memcard-00 ~A)~%" (-> obj memcard-00))
+  (format file "  (memcard-01 #x~X)~%" (-> obj memcard-01))
+  (format file "  (memcard-02 #x~X)~%" (-> obj memcard-02))
+  (format file "  (memcard-03 #x~X)~%" (-> obj memcard-03))
   #|
   (format file "  (scenes-seen")
   (dotimes (i PC_SPOOL_LOG_LENGTH)
