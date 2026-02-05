@@ -28,10 +28,10 @@
 
 (defun progress-allowed? ()
   (not (or (-> *setting-control* current talking)
-          ;;  (-> *setting-control* current movie)
+           (-> *setting-control* current movie)
            (movie?)
-          ;;  (handle->process (-> *game-info* pov-camera-handle))
-          ;;  (handle->process (-> *game-info* other-camera-handle))
+           (handle->process (-> *game-info* pov-camera-handle))
+           (handle->process (-> *game-info* other-camera-handle))
            (< (-> *display* base-frame-counter) (-> *game-info* letterbox-time))
            (< (-> *display* base-frame-counter) (-> *game-info* blackout-time))
            (!= (-> *setting-control* current bg-a) 0.0)
@@ -428,7 +428,7 @@
 (defconstant *progress-stack-top* (&-> *progress-stack* #x3800))
 
 (defun activate-progress ((creator process) (screen progress-screen))
-  (when *target*
+
     (cond
       ((not *progress-process*)
        (when (progress-allowed?)
@@ -440,11 +440,7 @@
          (let ((s5-1 *progress-process*))
            (set! (-> s5-1 0 completion-percentage) (calculate-completion (-> s5-1 0)))
            (set! *master-mode* 'progress)
-           (let ((s4-1 (-> *target* current-level)))
-             (cond
-               ((!= *kernel-boot-message* 'play) (set! (-> s5-1 0 display-level-index) 4))
-               ((or (= s4-1 #f) (< (length *level-task-data-remap*) (-> s4-1 info index))) (set! (-> s5-1 0 display-level-index) 0) 0)
-               (else (set! (-> s5-1 0 display-level-index) (-> *level-task-data-remap* (+ (-> s4-1 info index) -1))))))
+
            (set! (-> s5-1 0 next-level-index) (-> s5-1 0 display-level-index))
            (set! (-> s5-1 0 display-state) (progress-screen invalid))
            (set-transition-progress! (-> s5-1 0) 512)
@@ -455,7 +451,7 @@
       (else
        (push! (-> *progress-process* 0))
        (set! (-> *progress-process* 0 next-display-state) screen)
-       (set! (-> *progress-process* 0 card-info) #f))))
+       (set! (-> *progress-process* 0 card-info) #f)))
   0
   (none))
 
