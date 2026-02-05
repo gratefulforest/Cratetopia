@@ -8,7 +8,7 @@
   "jungle-obs.o"
   "jungle-mirrors.o"
   "junglefish.o"
-  "fisher.o"
+  ;; "fisher.o"
   "jungle-part.o"
   "launcherdoor.o"
   "tpage-385.go"

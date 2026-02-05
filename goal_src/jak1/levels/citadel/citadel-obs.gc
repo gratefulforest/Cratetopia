@@ -618,7 +618,7 @@
       (update-transforms! (-> self root))
       (loop
         (when (-> self shield-on)
-          (update! (-> self sound))
+          ;; (update! (-> self sound))
           (spawn (-> self part) (-> self root trans))
           (set! (-> *palette-fade-controls* control 7 fade) 1.0))
         (suspend)))

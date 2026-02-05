@@ -307,26 +307,7 @@
              :vis-nick 'bea
              :lev0 'beach
              :disp0 'display
-             :lev1 'village1
-             :disp1 'display)
-        (new 'static
-             'continue-point
-             :name "beach-jungle-start"
-             :level 'beach
-             :trans
-             (new 'static 'vector :x -504960.22 :y 9477.325 :z -223513.81 :w 1.0)
-             :quat
-             (new 'static 'quaternion :y 0.9486 :w -0.3163)
-             :camera-trans
-             (new 'static 'vector :x -487550.16 :y 28354.15 :z -184211.05 :w 1.0)
-             :camera-rot
-             (new 'static 'array float 9 -0.9139 0.0 0.4058 -0.0551 0.9907 -0.1241 -0.4021 -0.1358 -0.9054)
-             :load-commands
-             '()
-             :vis-nick 'bea
-             :lev0 'beach
-             :disp0 'display
-             :lev1 'jungle
+             :lev1 #f
              :disp1 #f))
        :tasks
        '(15 16 17 18 19 20 21 22)
@@ -1185,7 +1166,7 @@
        :nickname 'rol
        :packages '(rolling)
        :sound-banks '(rolling)
-       :music-bank 'rolling
+       :music-bank #f
        :ambient-sounds
        '()
        :mood '*rolling-mood*
@@ -1210,8 +1191,8 @@
              :vis-nick 'rol
              :lev0 'rolling
              :disp0 'display
-             :lev1 'village2
-             :disp1 'display))
+             :lev1 #f
+             :disp1 #f))
        :tasks
        '(52 53 54 55 56 57 58 59)
        :priority 100
@@ -1945,7 +1926,7 @@
        :nickname 'cit
        :packages '(citadel)
        :sound-banks '(citadel)
-       :music-bank 'citadel
+       :music-bank #f
        :ambient-sounds
        '()
        :mood '*citadel-mood*
@@ -1970,7 +1951,7 @@
              :vis-nick 'cit
              :lev0 'citadel
              :disp0 'display
-             :lev1 'lavatube
+             :lev1 #f
              :disp1 #f)
         (new 'static
              'continue-point
