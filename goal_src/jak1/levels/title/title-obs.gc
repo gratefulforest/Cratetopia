@@ -300,6 +300,8 @@
         (set! *camera-look-through-other* 2)
         (suspend))))
 
+(define-extern *mode* symbol)
+
 (defstate ndi (logo)
   :virtual #t
   :event
@@ -312,9 +314,20 @@
       (apply-settings *setting-control*)
       (set-time! (-> self state-time))
       (if *time-of-day-proc* (set! (-> *time-of-day-proc* 0 hour) 12))
-      (set! (-> self done?) #f))
+      (set! (-> self done?) #f)
+      (set! *mode* 'intro)
+      (set! (-> self draw bounds w) 0.0)
+      (process-spawn block (static-vectorm -4.5 -0.35 0) 0.0 0.0 0 2 0.0 :to self)
+      (process-spawn block (static-vectorm -3.5 -0.35 0) 0.0 0.0 0 3 0.0 :to self)
+      (process-spawn block (static-vectorm -2.5 -0.35 0) 0.0 0.0 0 1 0.0 :to self)
+      (process-spawn block (static-vectorm -1.5 -0.35 0) 0.0 0.0 0 0 0.0 :to self)
+      (process-spawn block (static-vectorm -0.5 -0.35 0) 0.0 0.0 0 3 0.0 :to self)
+      (process-spawn block (static-vectorm 0.5 -0.35 0) 0.0 0.0 0 1 0.0 :to self)
+      (process-spawn block (static-vectorm 1.5 -0.35 0) 0.0 0.0 0 2 0.0 :to self)
+      (process-spawn block (static-vectorm 2.5 -0.35 0) 0.0 0.0 0 0 0.0 :to self))
   :exit
     (behavior ()
+      (dotimes (count 8) (deactivate (process-by-type block self)))
       ((-> (method-of-type logo startup) exit))
       (set-blackout-frames (seconds 0.035)))
   :trans
@@ -353,8 +366,6 @@
       (set! (-> self camera)
             (ppointer->handle (process-spawn othercam (handle->process (-> self camera-anim)) 3 #t 'logo :to (handle->process (-> self camera-anim)))))
       (send-event (handle->process (-> self camera)) 'mask 0)
-      (set! (-> self volumes) (ppointer->handle (process-spawn logo-slave (-> self entity) *ndi-volumes-sg* :to self)))
-      (send-event (handle->process (-> self volumes)) 'origin-joint-index 3)
       (set! (-> self target) (ppointer->handle (process-spawn logo-slave #f *jchar-sg* :to self)))
       (send-event (handle->process (-> self target)) 'blend-shape #t)
       (send-event (handle->process (-> self target)) 'origin-joint-index 33)
