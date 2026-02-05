@@ -371,7 +371,15 @@
   ;; keep blocking-plane stuff loaded
   "blocking-plane.o"
   "ef-plane-ag.go"
+  "firecanyon-obs.o"
+  "dark-plant-ag.go"
   "tntbarrel-ag.go"
+  "balloon-ag.go"
+  "citb-drop-plat-ag.go"
+  "citb-sagecage-ag.go"
+  "green-sagecage-ag.go"
+  "plat-ag.go"
+  "fisher-ag.go"
   "block-game-ag.go"
   "block-obs.o"
  ))
