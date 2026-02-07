@@ -481,7 +481,7 @@
     (set! (-> self moved) #t)
     (set! (-> self timeout) (current-time)))
   (when (and (!= *mode* 'menu) (= type 'sideways))
-    (if (= (-> (the block (get-block -1)) look) 7) (sound-play "walk-grass2") (sound-play "walk-stone1")))
+    (if (= (-> (the block (get-block -1)) look) 7) (sound-play "walk-grass2" :vol 90) (sound-play "walk-stone1")))
   (when (and (!= *mode* 'menu) (= type 'rotate))
     (dotimes (count 2) (if (= (-> (the block (get-block -1)) look) 7) (sound-play "land-grass") (sound-play "jump"))))
   (for-block piece x y
@@ -994,4 +994,6 @@
             ((30) (move (-> self piece) (+ (-> self x) (rand-vu-int-range 1 2)) (-> self y) 'rotate)))))
       (suspend))))
 
-(defun spawn-block-game () (process-spawn block-game :name "block-game-1" :to *entity-pool*) (none))
+(defun spawn-block-game ()
+  (process-spawn block-game :name "block-game-1" :to *entity-pool*)
+  (none))
