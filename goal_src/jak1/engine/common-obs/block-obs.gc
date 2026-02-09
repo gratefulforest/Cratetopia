@@ -409,8 +409,7 @@
 
 (defbehavior find-around block-game ((index int) (look int))
   (for-direction index
-    (if (= (-> (-> self field) (check index direction #f)) look)
-      (return #t)))
+    (if (= (-> (-> self field) (check index direction #f)) look) (return #t)))
   #f)
 
 (defbehavior balloon-effect block-game ((index int))
@@ -567,7 +566,7 @@
       ((18) (sound-play "get-yellow-eco") (beam-color 32.0 32.0 0.0))
       ((19) (sound-play "get-blue-eco") (beam-color 0.0 80.0 255.0)))
     (if (= *mode* 'tile) (set! next (if (or (rand-vu-percent? 0.04) (>= (-> self dry) 20)) 15 -1)))
-    (if (= *mode* 'plant) (set! next (if (rand-vu-percent? 0.004) 9 (if (and (= look 7) (or (rand-vu-percent? 0.2) (>= (-> self dry) 5))) 20 7))))
+    (if (= *mode* 'plant) (set! next (if (rand-vu-percent? 0.0034) 9 (if (and (= look 7) (or (rand-vu-percent? 0.2) (>= (-> self dry) 5))) 20 7))))
     (if (= *mode* 'normal) (set! next (if (rand-vu-percent? 0.01) (rand-vu-int-range 17 19) (/ (the-as int (-> self next)) 4))))
     (case next ((15) (set! (-> self next) 0) (set! (-> self dry) 0)) ((20) (set! (-> self dry) 0)) (else (+! (-> self dry) 1)))
     (let ((colors (new 'stack-no-clear 'vector)))
@@ -997,3 +996,4 @@
 (defun spawn-block-game ()
   (process-spawn block-game :name "block-game-1" :to *entity-pool*)
   (none))
+
