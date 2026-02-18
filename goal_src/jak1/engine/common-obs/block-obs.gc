@@ -842,6 +842,7 @@
     (set! (-> self sound) (new 'process 'ambient-sound (static-sound-spec "waterfall" :volume 0 :fo-max 5000) (-> self root trans))))
   (when (name= (-> *game-info* current-continue name) 'citadel-start)
     (set! *mode* 'tile)
+    (beam-color 64.0 64.0 64.0)
     (make-light-kit (-> *citadel-mood* light-group 1) (degrees 45) 1.0 1.0 1.0)
     (set! (-> *part-id-table* 2473 init-specs 4 initial-valuef) (meters 3.0))
     (load-level 'citadel #f (static-vectorm 2845 9 -4713) #f))
@@ -918,9 +919,7 @@
         (volume (the float (-> (-> self sound) volume))))
     (update! (-> self sound))
     (set! (-> (-> self sound) volume) (the int (lerp volume (if balloon 1000.0 0.0) (* 0.04 DISPLAY_FPS_RATIO))))
-    (when balloon
-      (launch-particles (-> *part-id-table* 37) (static-vectorm -339 45 -1640))
-      (launch-particles (-> *part-id-table* 38) (static-vectorm -339 45 -1640)))
+    (if balloon (dotimes (count 2) (launch-particles (-> *part-id-table* (if (= count 0) 37 38)) (static-vectorm -339 45 -1640))))
     (cond
       ((and balloon (> (-> *time-of-day-proc* 0 time-of-day) 8.2)) (set! (-> *time-of-day-proc* 0 time-ratio) -50000.0))
       ((and (not balloon) (< (-> *time-of-day-proc* 0 time-of-day) 9.0)) (set! (-> *time-of-day-proc* 0 time-ratio) 50000.0))
@@ -996,4 +995,3 @@
 (defun spawn-block-game ()
   (process-spawn block-game :name "block-game-1" :to *entity-pool*)
   (none))
-
