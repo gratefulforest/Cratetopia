@@ -826,6 +826,7 @@
     (beam-color 0.0 0.0 128.0)
     (make-light-kit (-> *sunken-mood* light-group 1) (degrees 45) 1.0 1.0 0.5)
     (set! (-> *game-info* current-continue level) #f)
+    (set! (-> *part-id-table* 33 init-specs 1 initial-valuef) 2.0)
     (process-spawn block-fisher #f :name "block-fisher-1" :to *entity-pool*)
     (process-spawn block-fisher #t :name "block-fisher-2" :to *entity-pool*)
     (load-params! (-> self sync) self (the-as uint 140) 0.0 0.15 0.15)
@@ -994,4 +995,5 @@
 
 (defun spawn-block-game ()
   (process-spawn block-game :name "block-game-1" :to *entity-pool*)
+
   (none))
