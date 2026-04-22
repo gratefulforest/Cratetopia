@@ -46,7 +46,7 @@
     (:launchrot-z (degrees 0.26661))
     (:rotate-y (degrees 90.0))))
 
-(defpartgroup plant-explode
+(defpartgroup group-plant-explode
   :id 3002
   :duration (seconds 0.017)
   :flags (use-local-clock)
@@ -297,7 +297,7 @@
           (if (< (get-current-phase (-> self sync)) 0.3)
             (set-vector! (-> self draw color-emissive) 0.0 0.4 0.37 0.0)
             (set-vector! (-> self draw color-emissive) 0.0 0.25 0.52 0.0))))
-      (when (and (nonzero? (-> self draw)) (!= *mode* 'menu) (!= (-> self look) 21))
+      (when (and (nonzero? (-> self draw)) (!= *mode* 'menu) (!= (-> self id) -100))
         (if (or (= *master-mode* 'progress) (and *hide* (<= (-> self id) -5)))
           (logior! (-> self draw status) (draw-status hidden))
           (logclear! (-> self draw status) (draw-status hidden))))
@@ -397,8 +397,7 @@
   (let ((id (+ index step)))
     (while (and (or (= step 1) (= step -1) (and (< id 200) (>= id 0)))
                 (or (= step -10) (= step 10) (and (<= id (+ (- index (mod index 10)) 9)) (>= id (- index (mod index 10))))))
-      (when (or (!= (-> (-> self field) id) -1) (not search))
-        (return id))
+      (if (or (!= (-> (-> self field) id) -1) (not search)) (return id))
       (+! id step))
   -100))
 
