@@ -89,6 +89,11 @@
 ;; all carousells
 (def-progress-carousell *carousell-display-mode* (windowed fullscreen borderless))
 
+(def-progress-carousell *carousell-leaderboard* (regular-game plant-battle citadel-drop crystal-glow))
+
+(def-progress-carousell *carousell-username* (a b c d e f g h i j k l m n o p q r s t u v w x y z
+  num-zero num-one two three four five six seven eight nine dash space backspace done))
+
 (def-progress-carousell *carousell-msaa* (off 2-times 4-times 8-times 16-times))
 
 (def-progress-carousell *carousell-lod-bg* (lod-high lod-low))
@@ -122,20 +127,6 @@
       ;;       :name (text-id save-and-load-game)
       ;;       :scale #t
       ;;       :param3 (game-option-menu save-and-load-game))
-       (new 'static
-            'game-option
-            :option-type (game-option-type menu)
-            :name (text-id guidelines)
-            :scale #t
-            :param3 (game-option-menu bad-disc))
-       (new 'static
-            'game-option
-            :option-type (game-option-type on-off)
-            :name (text-id fisherman)
-            :scale #t
-            :option-disabled-func
-            (lambda ()
-              (< (/ (-> *pc-settings* memcard-01) 1000) 200000)))
        (new 'static
             'game-option
             :option-type (game-option-type menu)
@@ -747,7 +738,7 @@
             :scale #t)
        (new 'static 'game-option :option-type (game-option-type button) :name (text-id back) :scale #t)))
 
-(define *block-game-options*
+(define *block-menu*
   (new 'static
        'boxed-array
        :type
@@ -790,10 +781,54 @@
               (initialize! *game-info* 'game (the-as game-save #f) "citadel-start")))
        (new 'static
             'game-option
-            :option-type (game-option-type menu)
-            :name (text-id high-scores)
+            :option-type (game-option-type slider)
+            :name (text-id crystal-glow)
             :scale #t
-            :param3 (game-option-menu no-disc))
+            :param1 0.0
+            :param2 19.0
+            :slider-step-size 0.25
+            :on-confirm
+            (lambda ()
+              (start 'play (the continue-point #f))
+              (initialize! *game-info* 'game (the-as game-save #f) "darkcave-start")))
+       (new 'static
+            'game-option
+            :option-type (game-option-type menu)
+            :name (text-id extras)
+            :scale #t
+            :param3 (game-option-menu block-extras))
+       (new 'static 'game-option :option-type (game-option-type button) :name (text-id back) :scale #t)))
+
+(define *block-extras*
+  (new 'static
+       'boxed-array
+       :type
+       game-option
+       (new 'static
+            'game-option
+            :option-type (game-option-type menu)
+            :name (text-id how-to-play)
+            :scale #t
+            :param3 (game-option-menu bad-disc))
+       (new 'static
+            'game-option
+            :option-type (game-option-type menu)
+            :name (text-id my-scores)
+            :scale #t
+            :param3 (game-option-menu block-scores))
+       (new 'static
+            'game-option
+            :option-type (game-option-type leaderboard)
+            :name (text-id leaderboards)
+            :scale #t)
+       (new 'static
+            'game-option
+            :option-type (game-option-type on-off)
+            :name (text-id fisherman)
+            :scale #t
+            :option-disabled-func
+            (lambda ()
+              (< (/ (-> *pc-settings* memcard-01) 1000) 200000)))
        (new 'static
             'game-option
             :option-type (game-option-type menu)
@@ -1348,6 +1383,54 @@
   (dotimes (i (pc-get-controller-count))
     (add-controller-option (text-id input-opts-generic-controller) i))
   (add-back-option)
+  *temp-options*)
+
+(defmacro add-scrolling-score (text1 text2 text3)
+  `(let ((option (-> *temp-options* (length *temp-options*))))
+     (set! (-> option option-type) (game-option-type button))
+     (set! (-> option name) (the text-id 0))
+     (let ((elapsed (mod (- (-> *display* real-frame-counter) (-> obj last-option-index-change)) 700)))
+       (copy-string<-string (-> option name-override)
+         (cond
+           ((and (= (-> obj option-index) (length *temp-options*)) (> elapsed 466)) ,text3)
+           ((and (= (-> obj option-index) (length *temp-options*)) (> elapsed 233)) ,text2)
+           (else ,text1))))
+     (set! (-> option scale) #t)
+     (+! (-> *temp-options* length) 1)))
+
+(defun build-block-leaderboards ((obj progress))
+  (add-back-option)
+  *temp-options*)
+
+(defun build-block-scores ((obj progress))
+  (set! (-> *temp-options* length) 0)
+  (set! (-> *temp-options* 0 option-type) (game-option-type username))
+  (set! (-> *temp-options* 0 name) (the text-id 0))
+  (set! (-> *temp-options* 0 value-to-modify) (&-> *progress-carousell* int-backup))
+  (copy-string<-string (-> *temp-options* 0 name-override) (string-format "NAME: ~S" (-> *pc-settings* username)))
+  (set! (-> *temp-options* 0 scale) #t)
+  (+! (-> *temp-options* length) 1)
+  (let ((lines (mod (-> *pc-settings* memcard-01) 1000)))
+    (add-scrolling-score (string-format "REGULAR: ~D" (/ (-> *pc-settings* memcard-01) 1000)) (string-format "LINES: ~D" lines)
+    (string-format "LEVEL: ~D" (max (logand (-> *pc-settings* memcard-05) 31) (/ lines 10)))))
+  (let ((lines (mod (-> *pc-settings* memcard-02) 1000)))
+    (add-scrolling-score (string-format "PLANT: ~D" (/ (-> *pc-settings* memcard-02) 1000)) (string-format "LINES: ~D" lines)
+    (string-format "LEVEL: ~D" (max (logand (-> *pc-settings* memcard-06) 31) (/ lines 10)))))
+  (let ((lines (mod (-> *pc-settings* memcard-03) 1000)))
+    (add-scrolling-score (string-format "CITADEL: ~D" (/ (-> *pc-settings* memcard-03) 1000)) (string-format "MATCHES: ~D" lines)
+    (string-format "LEVEL: ~D" (max (logand (-> *pc-settings* memcard-07) 31) (/ lines 10)))))
+  (let ((lines (mod (-> *pc-settings* memcard-04) 1000)))
+    (add-scrolling-score (string-format "CRYSTAL: ~D" (/ (-> *pc-settings* memcard-04) 1000)) (string-format "LINES: ~D" lines)
+    (string-format "LEVEL: ~D" (max (logand (-> *pc-settings* memcard-08) 31) (/ lines 10)))))
+  (+! (-> *temp-options* length) 2)
+  (set! (-> *temp-options* 5 option-type) (game-option-type button))
+  (set! (-> *temp-options* 5 name) (text-id back))
+  (copy-string<-string (-> *temp-options* 5 name-override) (string-format "UPLOAD SCORES"))
+  (set! (-> *temp-options* 5 scale) #t)
+  (set! (-> *temp-options* 6 option-type) (game-option-type button))
+  (set! (-> *temp-options* 6 name) (text-id back))
+  (copy-string<-string (-> *temp-options* 6 name-override) (string-format "BACK"))
+  (set! (-> *temp-options* 6 scale) #t)
   *temp-options*)
 
 (define *analog-bind-names*
@@ -2136,13 +2219,17 @@
   (set! (-> *options-remap* (progress-screen memcard-auto-save-error)) *ok-options*)
   (set! (-> *options-remap* (progress-screen memcard-removed)) *ok-options*)
   (set! (-> *options-remap* (progress-screen memcard-no-data)) *yes-no-options*)
-  (set! (-> *options-remap* (progress-screen title)) *block-game-options*)
-  (set! (-> *block-game-options* 0 value-to-modify) (&-> *progress-carousell* int-backup))
-  (set! (-> *block-game-options* 1 value-to-modify) (&-> *progress-carousell* int-backup))
-  (set! (-> *block-game-options* 2 value-to-modify) (&-> *progress-carousell* int-backup))
-  (set! (-> *block-game-options* 3 value-to-modify) (&-> *progress-carousell* int-backup))
-  (set! (-> *block-game-options* 4 value-to-modify) (&-> *progress-carousell* int-backup))
-  (set! (-> *main-options-pc* 1 value-to-modify) (&-> *pc-settings* memcard-00))
+  (set! (-> *options-remap* (progress-screen title)) *block-menu*)
+  (set! (-> *block-menu* 0 value-to-modify) (&-> *progress-carousell* int-backup))
+  (set! (-> *block-menu* 1 value-to-modify) (&-> *progress-carousell* int-backup))
+  (set! (-> *block-menu* 2 value-to-modify) (&-> *progress-carousell* int-backup))
+  (set! (-> *block-menu* 3 value-to-modify) (&-> *progress-carousell* int-backup))
+  (set! (-> *block-menu* 4 value-to-modify) (&-> *progress-carousell* int-backup))
+  (set! (-> *options-remap* (progress-screen block-extras)) *block-extras*)
+  (set! (-> *block-extras* 1 value-to-modify) (&-> *progress-carousell* int-backup))
+  (set! (-> *block-extras* 3 value-to-modify) (&-> *pc-settings* memcard-00))
+  (set! (-> *options-remap* (progress-screen block-leaderboards)) *temp-options*)
+  (set! (-> *options-remap* (progress-screen block-scores)) *temp-options*)
   (set! (-> *options-remap* (progress-screen settings-title)) *options*)
   (set! (-> *options-remap* (progress-screen auto-save)) *ok-options*)
   (set! (-> *options-remap* (progress-screen pal-change-to-60hz)) *yes-no-options*)
@@ -2264,7 +2351,9 @@
     (((progress-screen monitor)) (build-monitor-options))
     (((progress-screen select-controller)) (build-controller-options))
     (((progress-screen controller-binds) (progress-screen keyboard-binds) (progress-screen mouse-binds))
-     (build-binding-reassignment-options (-> obj display-state))))
+     (build-binding-reassignment-options (-> obj display-state)))
+    (((progress-screen block-leaderboards)) (build-block-leaderboards obj))
+    (((progress-screen block-scores)) (build-block-scores obj)))
   ;; run nav code
   (let ((options (-> *options-remap* (-> obj display-state))))
     ;; snap scroll if oob
@@ -2341,6 +2430,8 @@
                    (set! sound? (!= (-> *progress-state* on-off-backup) #t))
                    (set! (-> *progress-state* on-off-backup) #t))
                   (((game-option-type display-mode)
+                    (game-option-type leaderboard)
+                    (game-option-type username)
                     (game-option-type msaa)
                     (game-option-type lod-bg)
                     (game-option-type lod-fg)
@@ -2427,6 +2518,8 @@
                    (set! sound? (!= (-> *progress-state* on-off-backup) #f))
                    (set! (-> *progress-state* on-off-backup) #f))
                   (((game-option-type display-mode)
+                    (game-option-type leaderboard)
+                    (game-option-type username)
                     (game-option-type msaa)
                     (game-option-type lod-bg)
                     (game-option-type lod-fg)
@@ -2487,7 +2580,11 @@
                      (-> *progress-state* language-backup)))
               (((game-option-type on-off) (game-option-type normal-inverted))
                (set! (-> (the-as (pointer symbol) (-> options (-> obj option-index) value-to-modify)))
-                     (-> *progress-state* on-off-backup))))
+                     (-> *progress-state* on-off-backup)))
+              (((game-option-type username))
+               (let ((name (symbol->string (-> *pc-settings* username))))
+                 (string-strip-whitespace! name)
+                 (set! (-> *pc-settings* username) (if (> (length name) 0) (string->symbol name) 'USER)))))
             ;; ding
             (sound-play "cursor-options")
             (set! (-> obj selected-option) #f))
@@ -2789,6 +2886,8 @@
                   (set! (-> *progress-carousell* x-offset) 0)
                   (case (-> options (-> obj option-index) option-type)
                     (((game-option-type display-mode)) (set! (-> *progress-carousell* current-carousell) *carousell-display-mode*))
+                    (((game-option-type leaderboard)) (set! (-> *progress-carousell* current-carousell) *carousell-leaderboard*))
+                    (((game-option-type username)) (set! (-> *progress-carousell* current-carousell) *carousell-username*))
                     (((game-option-type msaa)) (set! (-> *progress-carousell* current-carousell) *carousell-msaa*))
                     (((game-option-type lod-bg)) (set! (-> *progress-carousell* current-carousell) *carousell-lod-bg*))
                     (((game-option-type lod-fg)) (set! (-> *progress-carousell* current-carousell) *carousell-lod-bg*))
@@ -2827,6 +2926,25 @@
                  ((0) (pc-set-display-mode! 'windowed (-> *pc-settings* window-width) (-> *pc-settings* window-height)))
                  ((1) (pc-set-display-mode! 'fullscreen 0 0))
                  ((2) (pc-set-display-mode! 'borderless 0 0))))
+              (((game-option-type leaderboard))
+               (set! (-> obj next-display-state) (progress-screen block-leaderboards)))
+              (((game-option-type username))
+               (let ((name (symbol->string (-> *pc-settings* username)))
+                     (letter (case (-> *progress-carousell* int-backup)
+                      ((0) "A") ((1) "B") ((2) "C") ((3) "D") ((4) "E") ((5) "F") ((6) "G") ((7) "H") ((8) "I") ((9) "J") ((10) "K")
+                      ((11) "L") ((12) "M") ((13) "N") ((14) "O") ((15) "P") ((16) "Q") ((17) "R") ((18) "S") ((19) "T") ((20) "U")
+                      ((21) "V") ((22) "W") ((23) "X") ((24) "Y") ((25) "Z") ((26) "0") ((27) "1") ((28) "2") ((29) "3") ((30) "4")
+                      ((31) "5") ((32) "6") ((33) "7") ((34) "8") ((35) "9") ((36) "-") ((37) " "))))
+                 (case (-> *progress-carousell* int-backup)
+                   ((38)
+                    (set! (-> *pc-settings* username) (string->symbol (substring! *temp-string* name 0 (- (length name) 1))))
+                    (set! (-> obj selected-option) #t))
+                   ((39)
+                    (string-strip-whitespace! name)
+                    (set! (-> *pc-settings* username) (if (> (length name) 0) (string->symbol name) 'USER)))
+                   (else
+                    (if (< (length name) 15) (set! (-> *pc-settings* username) (string->symbol (string-format "~S~S" name letter))))
+                    (set! (-> obj selected-option) #t)))))
               (((game-option-type msaa))
                (case (-> *progress-carousell* int-backup)
                  ((0) (set! (-> *pc-settings* gfx-msaa) 1))
@@ -3117,9 +3235,12 @@
                                       (lookup-text! *common-text* (text-id no) #f)))))
               ;; menu option or simple button. just draw its text!
               (((game-option-type menu) (game-option-type button))
-               (if (nonzero? (-> options index name))
-                 (set! option-str (lookup-text! *common-text* (-> options index name) #f))
-                 (set! option-str #f))
+               (cond
+                 ((nonzero? (-> options index name-override))
+                  (set! option-str (the string (-> options index name-override))))
+                 ((nonzero? (-> options index name))
+                  (set! option-str (lookup-text! *common-text* (-> options index name) #f)))
+                 (else (set! option-str #f)))
                ;; if autosave disabled, update text and lock it
                (when (and (not (-> *setting-control* default auto-save)) (= (text-id disable-auto-save) (-> options index name)))
                  (set! option-str (lookup-text! *common-text* (text-id auto-save-disabled) #f))
@@ -3167,19 +3288,23 @@
                   (set! (-> font origin y) (the float (+ y-off -8)))
                   (set-scale! font 0.6)
                   ;; we use the binding name for the selected text header
-                  (if (= (-> options index option-type) (game-option-type binding-assignment))
-                    ;; display timeout in seconds
-                    (let ((time-left (the int (+ 11.0 (* (/ 1.0 TICKS_PER_SECOND) (* -1.0 (- (-> *display* real-frame-counter) *progress-pad-timeout*)))))))
-                      ;; if the timeout is over, unselect the option
-                      (when (<= time-left 0)
-                        (set! (-> obj selected-option) #f)
-                        (sound-play "menu-stats")
-                        (pc-stop-waiting-for-bind!))
-                      (when (not (pc-waiting-for-bind?))
-                        (set! (-> obj selected-option) #f)
-                        (sound-play "cursor-options"))
-                      (print-game-text (string-format "~S (~4L~D~0L)" (-> options index name-override) time-left) font #f 128 22))
-                    (print-game-text (lookup-text! *common-text* (-> options index name) #f) font #f 128 22))
+                  (case (-> options index option-type)
+                    (((game-option-type binding-assignment))
+                     ;; display timeout in seconds
+                     (let ((time-left (the int (+ 11.0 (* (/ 1.0 TICKS_PER_SECOND) (* -1.0 (- (-> *display* real-frame-counter) *progress-pad-timeout*)))))))
+                       ;; if the timeout is over, unselect the option
+                       (when (<= time-left 0)
+                         (set! (-> obj selected-option) #f)
+                         (sound-play "menu-stats")
+                         (pc-stop-waiting-for-bind!))
+                       (when (not (pc-waiting-for-bind?))
+                         (set! (-> obj selected-option) #f)
+                         (sound-play "cursor-options"))
+                       (print-game-text (string-format "~S (~4L~D~0L)" (-> options index name-override) time-left) font #f 128 22)))
+                    (((game-option-type username))
+                     (print-game-text (string-format "~S" (-> *pc-settings* username)) font #f 128 22))
+                    (else
+                      (print-game-text (lookup-text! *common-text* (-> options index name) #f) font #f 128 22)))
                   (set! option-y (+ y-off 7))
                   (case (-> options index option-type)
                     (((game-option-type slider))
@@ -3235,6 +3360,8 @@
                           (set! option-str (string-format "~S" (lookup-text! *common-text* (text-id input-opts-binds-unknown) #f))))
                          (else (set! option-str (string-format "~S" *pc-cpp-temp-string*))))))
                     (((game-option-type display-mode)
+                      (game-option-type leaderboard)
+                      (game-option-type username)
                       (game-option-type msaa)
                       (game-option-type lod-bg)
                       (game-option-type lod-fg)
@@ -3301,6 +3428,8 @@
                     (((game-option-type slider)
                       (game-option-type aspect-ratio)
                       (game-option-type display-mode)
+                      (game-option-type leaderboard)
+                      (game-option-type username)
                       (game-option-type msaa)
                       (game-option-type lod-bg)
                       (game-option-type lod-fg)
@@ -3308,8 +3437,12 @@
                       (game-option-type frame-rate)
                       (game-option-type normal-inverted)
                       (game-option-type confirmation))
-                     ;; slider and aspect ratio options just show their text
-                     (set! option-str (lookup-text! *common-text* (-> options index name) #f)))
+                     (cond
+                       ((nonzero? (-> options index name-override))
+                        (set! option-str (the string (-> options index name-override))))
+                       ((nonzero? (-> options index name))
+                        (set! option-str (lookup-text! *common-text* (-> options index name) #f)))
+                       (else (set! option-str #f))))
                     (((game-option-type on-off) (game-option-type aspect-native))
                      ;; on-off options show their text + on or off
                      (set! option-str
@@ -3549,7 +3682,10 @@
               (progress-screen aspect-ratio)
               (progress-screen secrets)
               (progress-screen cheats)
-              (progress-screen monitor))
+              (progress-screen monitor)
+              (progress-screen block-extras)
+              (progress-screen block-leaderboards)
+              (progress-screen block-scores))
              (hide-progress-icons)
              (draw-options self 115 25 0.82))
             (((progress-screen settings) (progress-screen settings-title)) (hide-progress-icons) (draw-options self 115 25 0.78))
