@@ -77,6 +77,7 @@
    (subtitles?          symbol) ;; if on, cutscene subtitles will show up
    (text-language       pc-language) ;; language for game text
    (subtitle-language   pc-language) ;; language for subtitles
+   (username            symbol)
    (money-starburst?    symbol) ;; add a starburst to the money
    (extra-hud?          symbol) ;; extra hud elements.
    (secrets             pc-game-secrets :inline) ;; hidden goodies and additional secrets!
@@ -85,7 +86,12 @@
    (memcard-00          symbol)
    (memcard-01          int)
    (memcard-02          int)
-   (memcard-03          int)))
+   (memcard-03          int)
+   (memcard-04          int)
+   (memcard-05          int)
+   (memcard-06          int)
+   (memcard-07          int)
+   (memcard-08          int)))
 
 (define *pc-settings* (the pc-settings-jak1 #f))
 
