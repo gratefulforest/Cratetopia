@@ -380,6 +380,10 @@
   "green-sagecage-ag.go"
   "plat-ag.go"
   "fisher-ag.go"
+  "cavecrystal-ag.go"
+  "mother-spider-ag.go"
+  "spider-egg-ag.go"
+  "baby-spider-ag.go"
   "block-game-ag.go"
   "block-obs.o"
  ))
