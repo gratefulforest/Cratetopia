@@ -851,9 +851,8 @@
   (eight #x4034)
   (nine #x4035)
   (dash #x4036)
-  (space #x4037)
-  (backspace #x4038)
-  (done #x4039)
+  (backspace #x4037)
+  (done #x4038)
 
   ;; GAME-TEXT-ID ENUM ENDS
   )
