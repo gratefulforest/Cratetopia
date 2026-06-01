@@ -8,7 +8,14 @@
 ;;---------------------------
 ;; pc menu extra stuff
 
-(defconstant PROGRESS_PC_PAGE_HEIGHT 7)
+(define *items-per-page* 7)
+
+(define *score1* (new 'global 'vector))
+(define *score2* (new 'global 'vector))
+(define *score3* (new 'global 'vector))
+(define *score4* (new 'global 'vector))
+
+(define *match* #f)
 
 (defconstant PROGRESS_SCROLL_DIR_UP -1)
 
@@ -36,7 +43,7 @@
 
 (defconstant *progress-scroll-start* (-> *progress-scroll* start-index))
 
-(defconstant *progress-scroll-end* (+ -1 PROGRESS_PC_PAGE_HEIGHT (-> *progress-scroll* start-index)))
+(defconstant *progress-scroll-end* (+ -1 *items-per-page* (-> *progress-scroll* start-index)))
 
 (defmacro progress-scroll-reset ()
   "resets scroll. nothing will be scrolling, as if it had finished."
@@ -92,7 +99,7 @@
 (def-progress-carousell *carousell-leaderboard* (regular-game plant-battle citadel-drop crystal-glow))
 
 (def-progress-carousell *carousell-username* (a b c d e f g h i j k l m n o p q r s t u v w x y z
-  num-zero num-one two three four five six seven eight nine dash space backspace done))
+  num-zero num-one two three four five six seven eight nine dash backspace done))
 
 (def-progress-carousell *carousell-msaa* (off 2-times 4-times 8-times 16-times))
 
@@ -220,26 +227,8 @@
             :name (text-id input-options)
             :scale #t
             :param3 (game-option-menu input-options))
-       (new 'static
-            'game-option
-            :option-type (game-option-type on-off)
-            :name (text-id play-hints)
-            :scale #t
-            :on-confirm
-            (lambda ()
-              (set! (-> *setting-control* default play-hints) (-> *pc-settings* memcard-play-hints?))))
-       (new 'static 'game-option :option-type (game-option-type on-off) :name (text-id subtitles) :scale #t)
-       (new 'static 'game-option :option-type (game-option-type on-off) :name (text-id hinttitles) :scale #t)
        (new 'static 'game-option :option-type (game-option-type language) :name (text-id language) :scale #t)
-       (new 'static 'game-option :option-type (game-option-type language-subtitles) :name (text-id subtitles-language) :scale #t)
        (new 'static 'game-option :option-type (game-option-type language-text) :name (text-id text-language) :scale #t)
-       (new 'static 'game-option :option-type (game-option-type speaker) :name (text-id subtitles-speaker) :scale #t)
-       (new 'static
-            'game-option
-            :option-type (game-option-type menu)
-            :name (text-id misc-options)
-            :scale #t
-            :param3 (game-option-menu misc-options))
        (new 'static 'game-option :option-type (game-option-type button) :name (text-id back) :scale #t)))
 
 (define *graphic-options-pc*
@@ -380,6 +369,14 @@
             :param3 (game-option-menu select-controller))
        (new 'static
             'game-option
+            :option-type (game-option-type slider)
+            :name (text-id controller-led-strength)
+            :scale #t
+            :param1 0.0
+            :param2 100.0
+            :slider-step-size 1.0)
+       (new 'static
+            'game-option
             :option-type (game-option-type on-off)
             :name (text-id vibrations)
             :scale #t
@@ -421,30 +418,6 @@
             :on-change
             (lambda ((val object))
               (let ((val-sym (the-as symbol val))) (set-ignore-controller-in-bg! *pc-settings* val-sym) (none))))
-       (new 'static
-            'game-option
-            :option-type (game-option-type on-off)
-            :name (text-id input-opts-controller-led-reflect-hp)
-            :scale #t
-            :option-disabled-func
-            (lambda ()
-              (not (pc-current-controller-has-led?))))
-       (new 'static
-            'game-option
-            :option-type (game-option-type on-off)
-            :name (text-id input-opts-controller-led-reflect-eco)
-            :scale #t
-            :option-disabled-func
-            (lambda ()
-              (not (pc-current-controller-has-led?))))
-       (new 'static
-            'game-option
-            :option-type (game-option-type on-off)
-            :name (text-id input-opts-controller-led-reflect-heat)
-            :scale #t
-            :option-disabled-func
-            (lambda ()
-              (not (pc-current-controller-has-led?))))
        (new 'static
             'game-option
             :option-type (game-option-type on-off)
@@ -584,12 +557,6 @@
        (new 'static
             'game-option
             :option-type (game-option-type menu)
-            :name (text-id camera-options)
-            :scale #t
-            :param3 (game-option-menu camera-options))
-       (new 'static
-            'game-option
-            :option-type (game-option-type menu)
             :name (text-id input-opts-controller-opts)
             :scale #t
             :param3 (game-option-menu controller-options)
@@ -675,16 +642,7 @@
        game-option
        (new 'static 'game-option :option-type (game-option-type lod-bg) :name (text-id lod-bg) :scale #t)
        (new 'static 'game-option :option-type (game-option-type lod-fg) :name (text-id lod-fg) :scale #t)
-       (new 'static 'game-option :option-type (game-option-type on-off) :name (text-id ps2-parts) :scale #t)
        (new 'static 'game-option :option-type (game-option-type on-off) :name (text-id force-envmap) :scale #t)
-       (new 'static
-            'game-option
-            :option-type (game-option-type on-off)
-            :name (text-id force-actors)
-            :scale #t
-            :option-disabled-func
-            (lambda ()
-              (-> *pc-settings* speedrunner-mode?)))
        (new 'static 'game-option :option-type (game-option-type button) :name (text-id back) :scale #t)))
 
 ;; TODO - aspect ratios are hard-coded
@@ -707,13 +665,6 @@
             :name (text-id aspect-fmt)
             :param1 16.0
             :param2 9.0
-            :scale #t)
-       (new 'static 'game-option :option-type (game-option-type aspect-new) :name (text-id aspect4x3-ps2) :param1 -1.0 :scale #t)
-       (new 'static
-            'game-option
-            :option-type (game-option-type aspect-new)
-            :name (text-id aspect16x9-ps2)
-            :param1 -2.0
             :scale #t)
        (new 'static
             'game-option
@@ -753,6 +704,8 @@
             :slider-step-size 0.25
             :on-confirm
             (lambda ()
+              (define-extern get-points (function int int))
+			  (if (< (get-points -1) 100000) (set! (-> *pc-settings* fisherman) #f))
               (start 'play (the continue-point #f))
               (initialize! *game-info* 'game (the-as game-save #f) "beach-start")))
        (new 'static
@@ -806,10 +759,9 @@
        game-option
        (new 'static
             'game-option
-            :option-type (game-option-type menu)
-            :name (text-id how-to-play)
-            :scale #t
-            :param3 (game-option-menu bad-disc))
+            :option-type (game-option-type leaderboard)
+            :name (text-id leaderboards)
+            :scale #t)
        (new 'static
             'game-option
             :option-type (game-option-type menu)
@@ -818,9 +770,10 @@
             :param3 (game-option-menu block-scores))
        (new 'static
             'game-option
-            :option-type (game-option-type leaderboard)
-            :name (text-id leaderboards)
-            :scale #t)
+            :option-type (game-option-type menu)
+            :name (text-id how-to-play)
+            :scale #t
+            :param3 (game-option-menu block-guide))
        (new 'static
             'game-option
             :option-type (game-option-type on-off)
@@ -828,7 +781,7 @@
             :scale #t
             :option-disabled-func
             (lambda ()
-              (< (/ (-> *pc-settings* memcard-01) 1000) 200000)))
+              (< (the-as int (-> *score1* x)) 100000)))
        (new 'static
             'game-option
             :option-type (game-option-type menu)
@@ -1385,9 +1338,31 @@
   (add-back-option)
   *temp-options*)
 
+(define-extern get-player (function int string symbol))
+(define-extern get-recent (function int symbol))
+(define-extern get-points (function int int))
+(define-extern get-lines (function int int))
+(define-extern get-level (function int int))
+(define-extern upload-scores (function string string none))
+(define-extern fill-leaderboard (function string string none))
+
+(defun build-block-leaderboards ((obj progress))
+  (set! (-> *temp-options* length) 0)
+  (while (= (get-player (length *temp-options*) *pc-cpp-temp-string*) #t)
+    (let ((option (-> *temp-options* (length *temp-options*)))
+	      (rank (+ (length *temp-options*) 1)))
+      (set! (-> option option-type) (game-option-type score))
+      (set! (-> option name) (the text-id 0))
+	  (copy-string<-string (-> option name-override) (if (<= rank 3) "   " (string-format "~D. " rank)))
+	  (cat-string<-string (-> option name-override) *pc-cpp-temp-string*)
+      (set! (-> option scale) #t)
+      (+! (-> *temp-options* length) 1)))
+  (add-back-option)
+  *temp-options*)
+
 (defmacro add-scrolling-score (text1 text2 text3)
   `(let ((option (-> *temp-options* (length *temp-options*))))
-     (set! (-> option option-type) (game-option-type button))
+     (set! (-> option option-type) (game-option-type score))
      (set! (-> option name) (the text-id 0))
      (let ((elapsed (mod (- (-> *display* real-frame-counter) (-> obj last-option-index-change)) 700)))
        (copy-string<-string (-> option name-override)
@@ -1398,10 +1373,6 @@
      (set! (-> option scale) #t)
      (+! (-> *temp-options* length) 1)))
 
-(defun build-block-leaderboards ((obj progress))
-  (add-back-option)
-  *temp-options*)
-
 (defun build-block-scores ((obj progress))
   (set! (-> *temp-options* length) 0)
   (set! (-> *temp-options* 0 option-type) (game-option-type username))
@@ -1410,28 +1381,103 @@
   (copy-string<-string (-> *temp-options* 0 name-override) (string-format "NAME: ~S" (-> *pc-settings* username)))
   (set! (-> *temp-options* 0 scale) #t)
   (+! (-> *temp-options* length) 1)
-  (let ((lines (mod (-> *pc-settings* memcard-01) 1000)))
-    (add-scrolling-score (string-format "REGULAR: ~D" (/ (-> *pc-settings* memcard-01) 1000)) (string-format "LINES: ~D" lines)
-    (string-format "LEVEL: ~D" (max (logand (-> *pc-settings* memcard-05) 31) (/ lines 10)))))
-  (let ((lines (mod (-> *pc-settings* memcard-02) 1000)))
-    (add-scrolling-score (string-format "PLANT: ~D" (/ (-> *pc-settings* memcard-02) 1000)) (string-format "LINES: ~D" lines)
-    (string-format "LEVEL: ~D" (max (logand (-> *pc-settings* memcard-06) 31) (/ lines 10)))))
-  (let ((lines (mod (-> *pc-settings* memcard-03) 1000)))
-    (add-scrolling-score (string-format "CITADEL: ~D" (/ (-> *pc-settings* memcard-03) 1000)) (string-format "MATCHES: ~D" lines)
-    (string-format "LEVEL: ~D" (max (logand (-> *pc-settings* memcard-07) 31) (/ lines 10)))))
-  (let ((lines (mod (-> *pc-settings* memcard-04) 1000)))
-    (add-scrolling-score (string-format "CRYSTAL: ~D" (/ (-> *pc-settings* memcard-04) 1000)) (string-format "LINES: ~D" lines)
-    (string-format "LEVEL: ~D" (max (logand (-> *pc-settings* memcard-08) 31) (/ lines 10)))))
-  (+! (-> *temp-options* length) 2)
-  (set! (-> *temp-options* 5 option-type) (game-option-type button))
-  (set! (-> *temp-options* 5 name) (text-id back))
-  (copy-string<-string (-> *temp-options* 5 name-override) (string-format "UPLOAD SCORES"))
+  (add-scrolling-score (string-format "REGULAR: ~D" (-> *score1* x)) (string-format "LINES: ~D" (-> *score1* y)) (string-format "LEVEL: ~D" (-> *score1* z)))
+  (add-scrolling-score (string-format "PLANT: ~D" (-> *score2* x)) (string-format "LINES: ~D" (-> *score2* y)) (string-format "LEVEL: ~D" (-> *score2* z)))
+  (add-scrolling-score (string-format "CITADEL: ~D" (-> *score3* x)) (string-format "MATCHES: ~D" (-> *score3* y)) (string-format "LEVEL: ~D" (-> *score3* z)))
+  (add-scrolling-score (string-format "CRYSTAL: ~D" (-> *score4* x)) (string-format "LINES: ~D" (-> *score4* y)) (string-format "LEVEL: ~D" (-> *score4* z)))
+  (+! (-> *temp-options* length) 1)
+  (set! (-> *temp-options* 5 option-type) (game-option-type menu))
+  (set! (-> *temp-options* 5 name) (text-id upload-scores))
   (set! (-> *temp-options* 5 scale) #t)
-  (set! (-> *temp-options* 6 option-type) (game-option-type button))
-  (set! (-> *temp-options* 6 name) (text-id back))
-  (copy-string<-string (-> *temp-options* 6 name-override) (string-format "BACK"))
-  (set! (-> *temp-options* 6 scale) #t)
+  (set! (-> *temp-options* 5 param3) (game-option-menu block-upload))
+  (add-back-option)
   *temp-options*)
+
+(defbehavior draw-block-guide progress ((arg0 font-context))
+  (set! (-> arg0 origin x) (the float (- (- 150) (-> self left-x-offset))))
+  (set! (-> arg0 scale) 0.49)
+  (set-width! arg0 720)
+  (set-height! arg0 25)
+  (set! (-> arg0 flags) (font-flags shadow kerning middle middle-vert large))
+  (let ((anim (-> self transition-percentage-invert)))
+    (set! (-> arg0 origin y) 13.0)
+    (print-game-text-scaled "BREAK MANY CRATES AT ONCE!" anim arg0 128)
+    (+! (-> arg0 origin y) 16.0)
+    (print-game-text-scaled "1 TO 19 IS 4 POINTS PER CRATE * SPEED" anim arg0 128)
+    (+! (-> arg0 origin y) 16.0)
+    (print-game-text-scaled "20 TO 29 IS 5 POINTS PER CRATE * SPEED" anim arg0 128)
+    (+! (-> arg0 origin y) 16.0)
+    (print-game-text-scaled "30 TO 39 IS 10 POINTS PER CRATE * SPEED" anim arg0 128)
+    (+! (-> arg0 origin y) 16.0)
+    (print-game-text-scaled "40+ IS THE BEST, 30 PER CRATE * SPEED" anim arg0 128)
+    (+! (-> arg0 origin y) 16.0)
+    (print-game-text-scaled "ECO-BREAKS TALLY WITH LINES IN THE SAME MOVE" anim arg0 128)
+    (+! (-> arg0 origin y) 16.0)
+    (print-game-text-scaled "ANY SIZE MATCH IN CITADEL IS 100 * SPEED" anim arg0 128)
+    (+! (-> arg0 origin y) 16.0)
+    (print-game-text-scaled "ECO BREAKS AREN\c12T LINES, SO DON\c12T SPEED YOU UP" anim arg0 128)
+    (+! (-> arg0 origin y) 16.0)
+    (print-game-text-scaled "RED ECO PUSHES DOWN, YELLOW SHOOTS SIDEWAYS" anim arg0 128)
+    (+! (-> arg0 origin y) 16.0)
+    (print-game-text-scaled "BLUE ECO BREAKS ANY CRATES YOU PASS BY" anim arg0 128))
+  (none))
+
+(defbehavior draw-block-upload progress ((arg0 font-context))
+  (set! (-> arg0 origin x) (the float (- (- 154) (-> self left-x-offset))))
+  (set! (-> arg0 scale) 0.75)
+  (set-width! arg0 720)
+  (set-height! arg0 25)
+  (set! (-> arg0 flags) (font-flags shadow kerning middle middle-vert large))
+  (let ((anim (-> self transition-percentage-invert)))
+    (set! (-> arg0 origin y) 83.0)
+    (print-game-text-scaled "UPLOAD ALL SCORES WITH NAME:" anim arg0 128)
+    (set! (-> arg0 origin y) 108.0)
+    (print-game-text-scaled (string-format "~S" (-> *pc-settings* username)) anim arg0 128))
+  (none))
+
+(defbehavior draw-block-waiting progress ((arg0 font-context))
+  (set! (-> *progress-process* 0 particles 31 init-pos y) 220.0)
+  (set! (-> *progress-process* 0 particles 31 init-pos x)
+        (the float
+             (- (if (or (< (mod (-> *display* real-frame-counter) 300) 270) (!= (-> self transition-percentage-invert) 1.0)) 215 -1000)
+                (-> self left-x-offset))))
+  (case (string->symbol *temp-string2*)
+    (('block-error)
+     (sound-play "start-options")
+	 (clear *temp-string2*)
+	 (set! (-> self next-display-state) (progress-screen block-error)))
+    (('block-upload-complete)
+     (sound-play "start-options")
+	 (clear *temp-string2*)
+	 (set! (-> self next-display-state) (progress-screen block-upload-complete)))
+    (('block-leaderboards)
+     (sound-play "start-options")
+	 (clear *temp-string2*)
+     (set! *items-per-page* 11)
+     (set! (-> self next-display-state) (progress-screen block-leaderboards))))
+  (none))
+
+(defbehavior draw-block-upload-complete progress ((arg0 font-context))
+  (set! (-> arg0 origin x) (the float (- (- 154) (-> self left-x-offset))))
+  (set! (-> arg0 scale) 0.75)
+  (set-width! arg0 720)
+  (set-height! arg0 25)
+  (set! (-> arg0 flags) (font-flags shadow kerning middle middle-vert large))
+  (let ((anim (-> self transition-percentage-invert)))
+    (set! (-> arg0 origin y) 92.0)
+    (print-game-text-scaled "UPLOAD COMPLETE" anim arg0 128))
+  (none))
+  
+(defbehavior draw-block-error progress ((arg0 font-context))
+  (set! (-> arg0 origin x) (the float (- (- 154) (-> self left-x-offset))))
+  (set! (-> arg0 scale) 0.75)
+  (set-width! arg0 720)
+  (set-height! arg0 25)
+  (set! (-> arg0 flags) (font-flags shadow kerning middle middle-vert large))
+  (let ((anim (-> self transition-percentage-invert)))
+    (set! (-> arg0 origin y) 92.0)
+    (print-game-text-scaled (string-format "AN ERROR OCCURED") anim arg0 128))
+  (none))
 
 (define *analog-bind-names*
   (new 'static
@@ -2014,9 +2060,8 @@
      (set! (-> this icons 4 scale-x) 0.017)
      (set! (-> this icons 4 scale-y) -0.0205)))
   (when (not (-> *pc-settings* use-vis?))
-    (format 0 "[PC] Adjusting sprite positioning, aspect-ratio: ~f~%" (-> *pc-settings* aspect-ratio))
-    (set! (-> this left-x-offset) (the int (pc-sprite-adjust-left (-> *pc-settings* aspect-ratio))))
-    (set! (-> this right-x-offset) (the int (pc-sprite-adjust-right (-> *pc-settings* aspect-ratio))))
+    (set! (-> this left-x-offset) (the int (* -62.0 (- 1.0 (-> *video-parms* relative-x-scale)))))
+    (set! (-> this right-x-offset) (the int (+ (* 107.0 (- 1.0 (-> *video-parms* relative-x-scale))) 20)))
     (set! *PC-CROSS-X-ADJUST* (pc-sprite-adjust-cross-x (-> *pc-settings* aspect-ratio)))
     (set! *PC-CROSS-Y-ADJUST* (pc-sprite-adjust-cross-y (-> *pc-settings* aspect-ratio)))
     (set! *PC-SQUARE-X-ADJUST* (pc-sprite-adjust-square-x (-> *pc-settings* aspect-ratio)))
@@ -2182,6 +2227,7 @@
 
 (defun init-game-options ((obj progress))
   "Set the options for all of the menus."
+  (set! *items-per-page* 7)
   ;; start off by making them all invalid
   (dotimes (i (progress-screen max))
     (set! (-> *options-remap* i) #f))
@@ -2226,10 +2272,14 @@
   (set! (-> *block-menu* 3 value-to-modify) (&-> *progress-carousell* int-backup))
   (set! (-> *block-menu* 4 value-to-modify) (&-> *progress-carousell* int-backup))
   (set! (-> *options-remap* (progress-screen block-extras)) *block-extras*)
-  (set! (-> *block-extras* 1 value-to-modify) (&-> *progress-carousell* int-backup))
-  (set! (-> *block-extras* 3 value-to-modify) (&-> *pc-settings* memcard-00))
+  (set! (-> *block-extras* 0 value-to-modify) (&-> *progress-carousell* int-backup))
+  (set! (-> *block-extras* 3 value-to-modify) (&-> *pc-settings* fisherman))
   (set! (-> *options-remap* (progress-screen block-leaderboards)) *temp-options*)
   (set! (-> *options-remap* (progress-screen block-scores)) *temp-options*)
+  (set! (-> *options-remap* (progress-screen block-guide)) *ok-options*)
+  (set! (-> *options-remap* (progress-screen block-upload)) *yes-no-options*)
+  (set! (-> *options-remap* (progress-screen block-upload-complete)) *ok-options*)
+  (set! (-> *options-remap* (progress-screen block-error)) *ok-options*)
   (set! (-> *options-remap* (progress-screen settings-title)) *options*)
   (set! (-> *options-remap* (progress-screen auto-save)) *ok-options*)
   (set! (-> *options-remap* (progress-screen pal-change-to-60hz)) *yes-no-options*)
@@ -2281,13 +2331,8 @@
   (set! (-> *sound-options* 2 value-to-modify) (&-> *setting-control* default dialog-volume))
   (set! (-> *yes-no-options* 0 value-to-modify) (&-> *progress-state* yes-no-choice))
   ;; our options!
-  (set! (-> *game-options-pc* 1 value-to-modify) (&-> *pc-settings* memcard-play-hints?))
-  (set! (-> *game-options-pc* 2 value-to-modify) (&-> *pc-settings* subtitles?))
-  (set! (-> *game-options-pc* 3 value-to-modify) (&-> *pc-settings* hinttitles?))
-  (set! (-> *game-options-pc* 4 value-to-modify) (&-> *setting-control* default language))
-  (set! (-> *game-options-pc* 5 value-to-modify) (&-> *progress-carousell* int-backup))
-  (set! (-> *game-options-pc* 6 value-to-modify) (&-> *progress-carousell* int-backup))
-  (set! (-> *game-options-pc* 7 value-to-modify) (&-> *progress-carousell* int-backup))
+  (set! (-> *game-options-pc* 1 value-to-modify) (&-> *setting-control* default language))
+  (set! (-> *game-options-pc* 2 value-to-modify) (&-> *progress-carousell* int-backup))
   (set! (-> *graphic-options-pc* 1 value-to-modify) (&-> *progress-carousell* int-backup))
   (set! (-> *graphic-options-pc* 3 value-to-modify) (&-> *pc-settings* vsync?))
   (set! (-> *graphic-options-pc* 5 value-to-modify) (&-> *progress-carousell* int-backup))
@@ -2301,26 +2346,22 @@
   (set! (-> *camera-options* 2 value-to-modify) (&-> *pc-settings* third-camera-h-inverted?))
   (set! (-> *camera-options* 3 value-to-modify) (&-> *pc-settings* third-camera-v-inverted?))
   ;; input options
-  (set! (-> *controller-options* 1 value-to-modify) (&-> *pc-settings* memcard-vibration?))
-  (set! (-> *controller-options* 2 value-to-modify) (&-> *pc-settings* stick-deadzone))
-  (set! (-> *controller-options* 3 value-to-modify) (&-> *pc-settings* stick-sensitivity))
-  (set! (-> *controller-options* 4 value-to-modify) (&-> *pc-settings* ignore-controller-win-unfocused?))
-  (set! (-> *controller-options* 5 value-to-modify) (&-> *pc-settings* controller-led-hp?))
-  (set! (-> *controller-options* 6 value-to-modify) (&-> *pc-settings* controller-led-eco?))
-  (set! (-> *controller-options* 7 value-to-modify) (&-> *pc-settings* controller-led-heat?))
-  (set! (-> *controller-options* 8 value-to-modify) (&-> *pc-settings* pressure-sensitivity-enabled?))
+  (set! (-> *controller-options* 1 value-to-modify) (&-> *pc-settings* controller-light))
+  (set! (-> *controller-options* 2 value-to-modify) (&-> *pc-settings* memcard-vibration?))
+  (set! (-> *controller-options* 3 value-to-modify) (&-> *pc-settings* stick-deadzone))
+  (set! (-> *controller-options* 4 value-to-modify) (&-> *pc-settings* stick-sensitivity))
+  (set! (-> *controller-options* 5 value-to-modify) (&-> *pc-settings* ignore-controller-win-unfocused?))
+  (set! (-> *controller-options* 6 value-to-modify) (&-> *pc-settings* pressure-sensitivity-enabled?))
   (set! (-> *mouse-options* 0 value-to-modify) (&-> *pc-settings* mouse-camera?))
   (set! (-> *mouse-options* 1 value-to-modify) (&-> *pc-settings* mouse-xsens))
   (set! (-> *mouse-options* 2 value-to-modify) (&-> *pc-settings* mouse-ysens))
   (set! (-> *mouse-options* 3 value-to-modify) (&-> *pc-settings* mouse-movement?))
-  (set! (-> *input-options* 2 value-to-modify) (&-> *pc-settings* keyboard-enabled?))
-  (set! (-> *input-options* 3 value-to-modify) (&-> *pc-settings* mouse-enabled?))
-  (set! (-> *input-options* 5 value-to-modify) (&-> *pc-settings* auto-hide-cursor?))
+  (set! (-> *input-options* 1 value-to-modify) (&-> *pc-settings* keyboard-enabled?))
+  (set! (-> *input-options* 2 value-to-modify) (&-> *pc-settings* mouse-enabled?))
+  (set! (-> *input-options* 4 value-to-modify) (&-> *pc-settings* auto-hide-cursor?))
   (set! (-> *gfx-ps2-options* 0 value-to-modify) (&-> *progress-carousell* int-backup))
   (set! (-> *gfx-ps2-options* 1 value-to-modify) (&-> *progress-carousell* int-backup))
-  (set! (-> *gfx-ps2-options* 2 value-to-modify) (&-> *pc-settings* ps2-parts?))
-  (set! (-> *gfx-ps2-options* 3 value-to-modify) (&-> *pc-settings* force-envmap?))
-  (set! (-> *gfx-ps2-options* 4 value-to-modify) (&-> *pc-settings* ps2-actor-vis?))
+  (set! (-> *gfx-ps2-options* 2 value-to-modify) (&-> *pc-settings* force-envmap?))
   (set! (-> *sound-options-pc* 0 value-to-modify) (&-> *pc-settings* memcard-volume-sfx))
   (set! (-> *sound-options-pc* 1 value-to-modify) (&-> *pc-settings* memcard-volume-music))
   (set! (-> *sound-options-pc* 2 value-to-modify) (&-> *pc-settings* memcard-volume-dialog))
@@ -2357,13 +2398,13 @@
   ;; run nav code
   (let ((options (-> *options-remap* (-> obj display-state))))
     ;; snap scroll if oob
-    (when (> (length options) PROGRESS_PC_PAGE_HEIGHT)
+    (when (> (length options) *items-per-page*)
       (set! (-> *progress-scroll* start-index)
-            (max (-> *progress-scroll* start-index) (- (-> obj option-index) (+ PROGRESS_PC_PAGE_HEIGHT -2)))))
+            (max (-> *progress-scroll* start-index) (- (-> obj option-index) (+ *items-per-page* -2)))))
     (when (and options (not (or (progress-scrolling?) (-> obj in-transition))))
       ;; only respond to inputs when transition is done (and also there's options at all)
       (cond
-        ((cpad-pressed? 0 up)
+        ((or (cpad-pressed? 0 up) (and (cpad-hold? 0 up) (>= (- (-> *display* real-frame-counter) (-> obj last-option-index-change)) 45)))
          ;; pressed up
          ;; original code checked hold and then press, because hold can be used during center screen option. which we don't use.
          (when (not (-> obj selected-option))
@@ -2372,12 +2413,12 @@
            (cond
              ((> (-> obj option-index) 0)
               (1-! (-> obj option-index))
-              (when (and (> (length options) PROGRESS_PC_PAGE_HEIGHT) (< (-> obj option-index) *progress-scroll-start*))
+              (when (and (> (length options) *items-per-page*) (< (-> obj option-index) *progress-scroll-start*))
                 (progress-scroll-up!)))
              (else
               (set! (-> obj option-index) (1- (length options)))
-              (set! (-> *progress-scroll* start-index) (max 0 (- (length options) PROGRESS_PC_PAGE_HEIGHT -1)))))))
-        ((cpad-pressed? 0 down)
+              (set! (-> *progress-scroll* start-index) (max 0 (- (length options) *items-per-page* -1)))))))
+        ((or (cpad-pressed? 0 down) (and (cpad-hold? 0 down) (>= (- (-> *display* real-frame-counter) (-> obj last-option-index-change)) 45)))
          ;; pressed down.
          (when (not (-> obj selected-option))
            (if (!= (length options) 1) (sound-play "cursor-up-down"))
@@ -2385,13 +2426,28 @@
            (cond
              ((< (-> obj option-index) (1- (length options)))
               (1+! (-> obj option-index))
-              (when (and (> (length options) PROGRESS_PC_PAGE_HEIGHT) (>= (-> obj option-index) *progress-scroll-end*))
+              (when (and (> (length options) *items-per-page*) (>= (-> obj option-index) *progress-scroll-end*))
                 (progress-scroll-down!)))
              (else (set! (-> obj option-index) 0) (set! (-> *progress-scroll* start-index) 0)))))
         ((cpad-hold? 0 left)
          ;; holding left. sliders use hold.
          (cond
-           ((cpad-pressed? 0 left)
+           ((or (cpad-pressed? 0 left) (and (>= (- (-> *display* real-frame-counter) (-> obj last-option-index-change)) 50)
+                                            (!= (-> options (-> obj option-index) option-type) (game-option-type slider))
+                                            (cpad-hold? 0 left)))
+            (set! (-> obj last-option-index-change) (-> *display* real-frame-counter))
+            (when (and (= (-> obj display-state) (progress-screen block-leaderboards)) (> (-> obj option-index) 0))
+              (let ((shift (- (-> obj option-index) (-> *progress-scroll* start-index)))
+                    (new (max 0 (- (-> *progress-scroll* start-index) 10))))
+                (cond
+                  ((and (< new (-> *progress-scroll* start-index)) (> (length options) *items-per-page*))
+                   (set! (-> *progress-scroll* real-index) (-> *progress-scroll* start-index))
+                   (set! (-> *progress-scroll* start-index) new)
+                   (set! (-> *progress-scroll* transition) 0.0)
+                   (set! (-> *progress-scroll* direction) PROGRESS_SCROLL_DIR_UP)
+                   (set! (-> obj option-index) (max 0 (min (- (length options) 1) (+ new shift)))))
+                   (else (set! (-> obj option-index) (max 0 (- (-> obj option-index) 10)))))
+                (sound-play "cursor-up-down")))
             ;; navigate left.
             (when (or (-> obj selected-option) (= (-> options (-> obj option-index) option-type) (game-option-type yes-no)))
               (let ((sound? #f))
@@ -2485,7 +2541,23 @@
         ((cpad-hold? 0 right)
          ;; holding right
          (cond
-           ((cpad-pressed? 0 right)
+           ((or (cpad-pressed? 0 right) (and (>= (- (-> *display* real-frame-counter) (-> obj last-option-index-change)) 50)
+                                             (!= (-> options (-> obj option-index) option-type) (game-option-type slider))
+                                             (cpad-hold? 0 right)))
+            (set! (-> obj last-option-index-change) (-> *display* real-frame-counter))
+            (when (and (= (-> obj display-state) (progress-screen block-leaderboards)) (< (-> obj option-index) (- (length options) 1)))
+              (let ((shift (- (-> obj option-index) (-> *progress-scroll* start-index)))
+                    (new (min (+ (- (length options) *items-per-page*) 1) (+ (-> *progress-scroll* start-index) 10))))
+                (cond
+	              ((and (> new (-> *progress-scroll* start-index)) (> (length options) *items-per-page*))
+                   (set! (-> *progress-scroll* real-index) (-> *progress-scroll* start-index))
+                   (set! (-> *progress-scroll* start-index) new)
+                   (set! (-> *progress-scroll* transition) 0.0)
+                   (set! (-> *progress-scroll* direction) PROGRESS_SCROLL_DIR_DOWN)
+                   (let ((remaining (- (- (length options) 1) new)))
+                     (set! (-> obj option-index) (min (- (length options) 1) (+ new (min shift (min (- *items-per-page* 1) remaining)))))))
+                  (else (set! (-> obj option-index) (min (- (length options) 1) (+ (-> obj option-index) 10)))))
+	            (sound-play "cursor-up-down")))
             ;; pressed right
             (when (or (-> obj selected-option) (= (-> options (-> obj option-index) option-type) (game-option-type yes-no)))
               (let ((sound? #f))
@@ -2580,11 +2652,7 @@
                      (-> *progress-state* language-backup)))
               (((game-option-type on-off) (game-option-type normal-inverted))
                (set! (-> (the-as (pointer symbol) (-> options (-> obj option-index) value-to-modify)))
-                     (-> *progress-state* on-off-backup)))
-              (((game-option-type username))
-               (let ((name (symbol->string (-> *pc-settings* username))))
-                 (string-strip-whitespace! name)
-                 (set! (-> *pc-settings* username) (if (> (length name) 0) (string->symbol name) 'USER)))))
+                     (-> *progress-state* on-off-backup))))
             ;; ding
             (sound-play "cursor-options")
             (set! (-> obj selected-option) #f))
@@ -2593,6 +2661,7 @@
                 (= (-> obj display-state) (progress-screen save-game))
                 (= (-> obj display-state) (progress-screen save-and-load-game))
                 (= (-> obj display-state) (progress-screen save-game-title)))
+            (set! *items-per-page* 7)
             ;; no option selected, go back
             (cpad-clear! 0 square)
             (cpad-clear! 0 triangle)
@@ -2618,6 +2687,14 @@
                ;; go to a menu
                (cpad-clear! 0 x)
                (cpad-clear! 0 circle)
+               (case (-> options (-> obj option-index) name)
+                 (((text-id my-scores))
+                  (set-vector! *score1* (the-as float (get-points -1)) (the-as float (get-lines -1)) (the-as float (get-level -1)) 1.0)
+                  (set-vector! *score2* (the-as float (get-points -2)) (the-as float (get-lines -2)) (the-as float (get-level -2)) 1.0)
+                  (set-vector! *score3* (the-as float (get-points -3)) (the-as float (get-lines -3)) (the-as float (get-level -3)) 1.0)
+                  (set-vector! *score4* (the-as float (get-points -4)) (the-as float (get-lines -4)) (the-as float (get-level -4)) 1.0))
+                 (((text-id extras))
+                  (set! (-> *score1* x) (the-as float (get-points -1)))))
                (cond
                  ((and (not (-> *setting-control* default auto-save))
                        (= (text-id disable-auto-save) (-> options (-> obj option-index) name)))
@@ -2638,6 +2715,7 @@
                   (set-master-mode 'game))
                  (((text-id back))
                   ;; go back!
+                  (set! *items-per-page* 7)
                   (if (= (-> obj display-state) (progress-screen settings)) (sound-play "menu-stats") (sound-play "cursor-options"))
                   (when (= (-> obj display-state) (progress-screen music-player))
                     (sound-group-pause (sound-group music))
@@ -2780,6 +2858,7 @@
                    ((= (-> options (-> obj option-index) name) (text-id fit-to-screen))
                     (set-aspect! *pc-settings* 4 3)
                     (false! (-> *pc-settings* use-vis?))
+                    (set! (-> *setting-control* default aspect-ratio) 'aspect4x3)
                     (set-aspect-ratio 'aspect4x3)
                     (true! (-> *pc-settings* aspect-ratio-auto?)))
                    ((= newx -1.0)
@@ -2792,7 +2871,9 @@
                     (true! (-> *pc-settings* use-vis?))
                     (set! (-> *setting-control* default aspect-ratio) 'aspect16x9)
                     (set-aspect-ratio 'aspect16x9))
-                   (else (set-aspect! *pc-settings* newx newy))))
+                   (else
+                    (set! (-> *setting-control* default aspect-ratio) 'aspect4x3)
+                    (set-aspect! *pc-settings* newx newy))))
                (cpad-clear! 0 x)
                (cpad-clear! 0 circle)
                (sound-play "cursor-options")
@@ -2886,8 +2967,14 @@
                   (set! (-> *progress-carousell* x-offset) 0)
                   (case (-> options (-> obj option-index) option-type)
                     (((game-option-type display-mode)) (set! (-> *progress-carousell* current-carousell) *carousell-display-mode*))
-                    (((game-option-type leaderboard)) (set! (-> *progress-carousell* current-carousell) *carousell-leaderboard*))
-                    (((game-option-type username)) (set! (-> *progress-carousell* current-carousell) *carousell-username*))
+                    (((game-option-type leaderboard))
+                     (set! (-> *progress-carousell* int-backup) 0)
+                     (set! (-> *progress-carousell* current-carousell) *carousell-leaderboard*)
+                     (set! (-> *progress-carousell* selection) 0))
+                    (((game-option-type username))
+                     (set! (-> *progress-carousell* int-backup) 0)
+                     (set! (-> *progress-carousell* current-carousell) *carousell-username*)
+                     (set! (-> *progress-carousell* selection) 0))
                     (((game-option-type msaa)) (set! (-> *progress-carousell* current-carousell) *carousell-msaa*))
                     (((game-option-type lod-bg)) (set! (-> *progress-carousell* current-carousell) *carousell-lod-bg*))
                     (((game-option-type lod-fg)) (set! (-> *progress-carousell* current-carousell) *carousell-lod-bg*))
@@ -2897,9 +2984,10 @@
                     (((game-option-type language-text)) (set! (-> *progress-carousell* current-carousell) *text-languages*))))))))
            (else
             ;; an option was selected. write stuff!
-            (if (= (-> options (-> obj option-index) option-type) (game-option-type confirmation))
-              (if (-> *progress-state* on-off-backup) (sound-play "menu-stats") (sound-play "cursor-options"))
-              (sound-play "start-options"))
+            (case (-> options (-> obj option-index) option-type)
+              (((game-option-type confirmation)) (if (-> *progress-state* on-off-backup) (sound-play "menu-stats") (sound-play "cursor-options")))
+              (((game-option-type leaderboard)) (sound-play "cursor-options"))
+              (else (sound-play "start-options")))
             (set! (-> obj selected-option) #f)
             (case (-> options (-> obj option-index) option-type)
               (((game-option-type cheat-toggle))
@@ -2927,21 +3015,24 @@
                  ((1) (pc-set-display-mode! 'fullscreen 0 0))
                  ((2) (pc-set-display-mode! 'borderless 0 0))))
               (((game-option-type leaderboard))
-               (set! (-> obj next-display-state) (progress-screen block-leaderboards)))
+               (let ((board (case (-> *progress-carousell* int-backup) ((0) "regular-game") ((1) "plant-battle") ((2) "citadel-drop") ((3) "crystal-glow"))))
+                 (push! obj)
+                 (set! *match* (if (= (-> *progress-carousell* int-backup) 2) #t #f))
+                 (clear *temp-string2*)
+                 (fill-leaderboard board *temp-string2*)
+                 (set! (-> obj next-display-state) (progress-screen block-waiting))))
               (((game-option-type username))
                (let ((name (symbol->string (-> *pc-settings* username)))
                      (letter (case (-> *progress-carousell* int-backup)
-                      ((0) "A") ((1) "B") ((2) "C") ((3) "D") ((4) "E") ((5) "F") ((6) "G") ((7) "H") ((8) "I") ((9) "J") ((10) "K")
-                      ((11) "L") ((12) "M") ((13) "N") ((14) "O") ((15) "P") ((16) "Q") ((17) "R") ((18) "S") ((19) "T") ((20) "U")
-                      ((21) "V") ((22) "W") ((23) "X") ((24) "Y") ((25) "Z") ((26) "0") ((27) "1") ((28) "2") ((29) "3") ((30) "4")
-                      ((31) "5") ((32) "6") ((33) "7") ((34) "8") ((35) "9") ((36) "-") ((37) " "))))
+                       ((0) "A") ((1) "B") ((2) "C") ((3) "D") ((4) "E") ((5) "F") ((6) "G") ((7) "H") ((8) "I") ((9) "J") ((10) "K")
+                       ((11) "L") ((12) "M") ((13) "N") ((14) "O") ((15) "P") ((16) "Q") ((17) "R") ((18) "S") ((19) "T") ((20) "U")
+                       ((21) "V") ((22) "W") ((23) "X") ((24) "Y") ((25) "Z") ((26) "0") ((27) "1") ((28) "2") ((29) "3") ((30) "4")
+                       ((31) "5") ((32) "6") ((33) "7") ((34) "8") ((35) "9") ((36) "-"))))
                  (case (-> *progress-carousell* int-backup)
-                   ((38)
+                   ((37)
                     (set! (-> *pc-settings* username) (string->symbol (substring! *temp-string* name 0 (- (length name) 1))))
                     (set! (-> obj selected-option) #t))
-                   ((39)
-                    (string-strip-whitespace! name)
-                    (set! (-> *pc-settings* username) (if (> (length name) 0) (string->symbol name) 'USER)))
+                   ((38) (none))
                    (else
                     (if (< (length name) 15) (set! (-> *pc-settings* username) (string->symbol (string-format "~S~S" name letter))))
                     (set! (-> obj selected-option) #t)))))
@@ -3032,9 +3123,22 @@
                 (initialize! *game-info* 'game (the-as game-save #f) "intro-start"))
               (set-master-mode 'game))
              (else (sound-play "cursor-options") (set! (-> obj next-display-state) (progress-screen invalid)))))
-          (((progress-screen memcard-insert))
+          (((progress-screen memcard-insert)
+            (progress-screen block-guide)
+            (progress-screen block-upload-complete)
+            (progress-screen block-error))
            (sound-play "cursor-options")
            (set! (-> obj next-display-state) (progress-screen invalid)))
+          (((progress-screen block-upload))
+           (cond
+             ((-> *progress-state* yes-no-choice)
+              (sound-play "cursor-options")
+              (clear *temp-string2*)
+              (upload-scores (symbol->string (-> *pc-settings* username)) *temp-string2*)
+              (set! (-> obj next-display-state) (progress-screen block-waiting)))
+             (else
+              (sound-play "cursor-options")
+              (set! (-> obj next-display-state) (progress-screen block-scores)))))
           (((progress-screen memcard-data-exists))
            (cond
              ((-> *progress-state* yes-no-choice)
@@ -3163,7 +3267,7 @@
   (let ((options (-> *options-remap* (-> obj display-state))))
     (when options
       ;; this menu has options to draw omg
-      (let* ((line-amt (if (> (length options) PROGRESS_PC_PAGE_HEIGHT) (1- PROGRESS_PC_PAGE_HEIGHT) (length options)))
+      (let* ((line-amt (if (> (length options) *items-per-page*) (1- *items-per-page*) (length options)))
              (y-off (- arg0 (/ (* arg1 line-amt) 2)))
              (option-count 0)
              (unkx 27)
@@ -3183,14 +3287,14 @@
           ((progress-scrolling-up?) (set! y-off (+ (- y-off arg1) (* (the float arg1) (-> *progress-scroll* transition))))))
         (let ((draw-arrows (and (not (-> obj in-transition))
                                 (= (-> obj next-state name) 'progress-normal)
-                                (> (length options) PROGRESS_PC_PAGE_HEIGHT)
+                                (> (length options) *items-per-page*)
                                 (< (mod (-> *display* real-frame-counter) (seconds 0.2)) (seconds 0.1))))
               (draw-prev (< 0 *progress-scroll-start*))
               (draw-next (> (length options) *progress-scroll-end*)))
           (set! (-> obj particles 32 init-pos x)
-                (the float (if (and draw-arrows draw-prev) (- 195 (-> *progress-process* 0 left-x-offset)) -320)))
+                (the float (if (and draw-arrows draw-prev) (- 211 (-> *progress-process* 0 left-x-offset)) -320)))
           (set! (-> obj particles 33 init-pos x)
-                (the float (if (and draw-arrows draw-next) (- 195 (-> *progress-process* 0 left-x-offset)) -320))))
+                (the float (if (and draw-arrows draw-next) (- 211 (-> *progress-process* 0 left-x-offset)) -320))))
         ;; cheating a bit and putting some screen-specific code here. it's not a big deal.
         (case (-> obj display-state)
           (((progress-screen music-player))
@@ -3213,7 +3317,7 @@
                             22)))
         (dotimes (index (length options))
           (let ((option-str (the string #f)) ;; the option text
-                (option-x 17)
+                (option-x 21)
                 (option-y y-off)
                 (locked? #f))
             ;; Check if the option should be disabled
@@ -3235,12 +3339,9 @@
                                       (lookup-text! *common-text* (text-id no) #f)))))
               ;; menu option or simple button. just draw its text!
               (((game-option-type menu) (game-option-type button))
-               (cond
-                 ((nonzero? (-> options index name-override))
-                  (set! option-str (the string (-> options index name-override))))
-                 ((nonzero? (-> options index name))
-                  (set! option-str (lookup-text! *common-text* (-> options index name) #f)))
-                 (else (set! option-str #f)))
+               (if (nonzero? (-> options index name))
+                 (set! option-str (lookup-text! *common-text* (-> options index name) #f))
+                 (set! option-str #f))
                ;; if autosave disabled, update text and lock it
                (when (and (not (-> *setting-control* default auto-save)) (= (text-id disable-auto-save) (-> options index name)))
                  (set! option-str (lookup-text! *common-text* (text-id auto-save-disabled) #f))
@@ -3250,6 +3351,10 @@
                           (= (text-id checkpoint-select) (-> options index name)))
                  (set! option-str (lookup-text! *common-text* (text-id cheat-req-beat-game) #f))
                  (true! locked?)))
+              (((game-option-type score))
+               (if (nonzero? (-> options index name-override))
+                 (set! option-str (the string (-> options index name-override)))
+                 (set! option-str #f)))
               (((game-option-type button-music))
                ;; a button for the music player. has the text "locked" sometimes!
                (if (and (nonzero? (-> options index name)) (find-music-log (progress-get-music-by-index index)))
@@ -3304,7 +3409,7 @@
                     (((game-option-type username))
                      (print-game-text (string-format "~S" (-> *pc-settings* username)) font #f 128 22))
                     (else
-                      (print-game-text (lookup-text! *common-text* (-> options index name) #f) font #f 128 22)))
+                     (print-game-text (lookup-text! *common-text* (-> options index name) #f) font #f 128 22)))
                   (set! option-y (+ y-off 7))
                   (case (-> options index option-type)
                     (((game-option-type slider))
@@ -3315,7 +3420,7 @@
                             (percentage (lerp-scale 0.0 1.0 (-> (the-as (pointer float) (-> options index value-to-modify))) (-> options index param1) (-> options index param2)))
                             (a0-34 (logior (logand v1-82 -256) (shr (shl (the int (+ 64.0 (* 191.0 percentage))) 56) 56)))
                             (color (logior (logand a0-34 -65281) (shr (shl (shr (shl a0-34 56) 56) 56) 48))))
-                       (draw-percent-bar (- 75 (-> obj left-x-offset)) (+ y-off 8) percentage (the-as rgba color))
+                       (draw-percent-bar (- 78 (-> obj left-x-offset)) (+ y-off 8) percentage (the-as rgba color))
                        (set! option-x (+ (the int (* 2.5 (* 100.0 percentage))) -100)))
                      (if (= (-> options index slider-show-decimal?) #t)
                        (set! option-str (string-format "~,,1f" (-> (the-as (pointer float) (-> options index value-to-modify)))))
@@ -3428,21 +3533,17 @@
                     (((game-option-type slider)
                       (game-option-type aspect-ratio)
                       (game-option-type display-mode)
-                      (game-option-type leaderboard)
-                      (game-option-type username)
                       (game-option-type msaa)
                       (game-option-type lod-bg)
                       (game-option-type lod-fg)
                       (game-option-type speaker)
                       (game-option-type frame-rate)
                       (game-option-type normal-inverted)
-                      (game-option-type confirmation))
-                     (cond
-                       ((nonzero? (-> options index name-override))
-                        (set! option-str (the string (-> options index name-override))))
-                       ((nonzero? (-> options index name))
-                        (set! option-str (lookup-text! *common-text* (-> options index name) #f)))
-                       (else (set! option-str #f))))
+                      (game-option-type confirmation)
+                      (game-option-type leaderboard))
+                     ;; slider and aspect ratio options just show their text
+                     (set! option-str (lookup-text! *common-text* (-> options index name) #f)))
+                    (((game-option-type username)) (set! option-str (the string (-> options index name-override))))
                     (((game-option-type on-off) (game-option-type aspect-native))
                      ;; on-off options show their text + on or off
                      (set! option-str
@@ -3516,7 +3617,7 @@
                            (string-format "~S: ~S"
                                           (lookup-text! *common-text* (-> options index name) #f)
                                           (lookup-text! *common-text* (get-language-name (-> *pc-settings* text-language)) #f)))))))))
-            (when (or (<= (length options) PROGRESS_PC_PAGE_HEIGHT)
+            (when (or (<= (length options) *items-per-page*)
                       (and (not (progress-scrolling?)) (>= index *progress-scroll-start*) (< index *progress-scroll-end*))
                       (and (progress-scrolling-down?) (>= index (1- *progress-scroll-start*)) (< index *progress-scroll-end*))
                       (and (progress-scrolling-up?) (>= index *progress-scroll-start*) (< index (1+ *progress-scroll-end*))))
@@ -3542,7 +3643,42 @@
                   (set! (-> font origin x) (the float (- option-x (-> obj left-x-offset))))
                   (set! (-> font origin y) (the float (the int (* (the float option-y) (if (-> options index scale) f0-23 1.0)))))
                   (set-scale! font (* arg2 f0-23 scroll-amt))
-                  (print-game-text option-str font #f (the int (* 128.0 f0-23 scroll-amt)) 22)))
+                  (cond
+                    ((= (-> obj display-state) (progress-screen block-leaderboards))
+                     (set! (-> font origin y) (the float (the int (- (* (the float option-y) (if (-> options index scale) f0-23 1.0)) 7))))
+                     (when (= (-> options index name) (text-id back))
+                       (set! (-> font flags) (font-flags shadow kerning middle middle-vert large))
+                       (print-game-text option-str font #f (the int (* 128.0 f0-23 scroll-amt)) 22))
+                     (when (!= (-> options index name) (text-id back))
+                       (set! (-> font origin x) (- 240.0 (* 190.0 (-> *video-parms* relative-x-scale))))
+                       (set! (-> font flags) (font-flags shadow kerning middle-vert large))
+                       (set-scale! font (* 0.63 f0-23 scroll-amt))
+                       (print-game-text option-str font #f (the int (* 128.0 f0-23 scroll-amt)) 22)
+                       (case index
+                         ((0) (if (!= index (-> obj option-index)) (set-color! font (font-color gold)))
+                          (print-game-text "1." font #f (the int (* 128.0 f0-23 scroll-amt)) 22))
+                         ((1) (if (!= index (-> obj option-index)) (set-color! font (font-color silver)))
+                          (print-game-text "2." font #f (the int (* 128.0 f0-23 scroll-amt)) 22))
+                         ((2) (if (!= index (-> obj option-index)) (set-color! font (font-color bronze)))
+                          (print-game-text "3." font #f (the int (* 128.0 f0-23 scroll-amt)) 22)))
+                       (when (!= index (-> obj option-index))
+                         (set-color! font (if (get-recent index) (font-color light-green) (font-color default))))
+                       (set! (-> font origin x) (+ 240.0 (* 135.0 (-> *video-parms* relative-x-scale))))
+                       (set! (-> font flags) (font-flags shadow kerning right middle-vert large))
+                       (let ((elapsed (mod (- (-> *display* real-frame-counter) (-> obj last-option-index-change)) 700)))
+                         (cond
+                           ((and (= index (-> obj option-index)) (> elapsed 466))
+                            (set-scale! font (* 0.57 f0-23 scroll-amt))
+                            (string-format "LEVEL:~D" (get-level index)))
+                           ((and (= index (-> obj option-index)) (> elapsed 233))
+                            (set-scale! font (* 0.57 f0-23 scroll-amt))
+                            (string-format "~S:~D" (if *match* "MATCH" "LINES") (get-lines index)))
+                           (else
+                            (set-scale! font (* 0.65 f0-23 scroll-amt))
+                            (string-format "~D" (get-points index)))))
+                       (print-game-text *temp-string* font #f (the int (* 128.0 f0-23 scroll-amt)) 22)))
+                    (else
+                      (print-game-text option-str font #f (the int (* 128.0 f0-23 scroll-amt)) 22)))))
               (+! y-off arg1)
               (+! option-count 1)))))))
   0
@@ -3650,7 +3786,12 @@
         (((progress-screen quit) (progress-screen quit-title)) (draw-quit obj a1-1))
         (((progress-screen memcard-disable-auto-save)) (draw-memcard-disable-auto-save obj a1-1))
         (((progress-screen memcard-auto-save-disabled)) (draw-memcard-auto-save-disabled obj a1-1))
-        (((progress-screen speedrun-options)) (draw-memcard-speedrun-options obj a1-1)))))
+        (((progress-screen speedrun-options)) (draw-memcard-speedrun-options obj a1-1))
+        (((progress-screen block-guide)) (draw-block-guide a1-1))
+        (((progress-screen block-upload)) (draw-block-upload a1-1))
+        (((progress-screen block-waiting)) (draw-block-waiting a1-1))
+        (((progress-screen block-upload-complete)) (draw-block-upload-complete a1-1))
+        (((progress-screen block-error)) (draw-block-error a1-1)))))
   0
   (none))
 
@@ -3684,10 +3825,12 @@
               (progress-screen cheats)
               (progress-screen monitor)
               (progress-screen block-extras)
-              (progress-screen block-leaderboards)
               (progress-screen block-scores))
              (hide-progress-icons)
              (draw-options self 115 25 0.82))
+            (((progress-screen block-leaderboards))
+             (hide-progress-icons)
+             (draw-options self 115 17 0.65))
             (((progress-screen settings) (progress-screen settings-title)) (hide-progress-icons) (draw-options self 115 25 0.78))
             (((progress-screen misc-options)) (hide-progress-icons) (draw-options self 115 25 0.79))
             (((progress-screen music-player)) (hide-progress-icons) (draw-options self 128 21 0.82))
@@ -3730,8 +3873,7 @@
               (progress-screen auto-save)
               (progress-screen load-game)
               (progress-screen save-game)
-              (progress-screen save-and-load-game)
-              )
+              (progress-screen save-and-load-game))
              (draw-notice-screen self)
              (draw-options self 190 0 0.82))
             (((progress-screen no-disc) (progress-screen bad-disc))
@@ -3740,7 +3882,17 @@
             (((progress-screen quit) (progress-screen quit-title) (progress-screen memcard-disable-auto-save))
              (draw-notice-screen self)
              (draw-options self 110 0 0.82))
-            (((progress-screen memcard-insert)) (draw-notice-screen self) (draw-options self 165 0 0.82))
+            (((progress-screen memcard-insert)
+              (progress-screen block-upload)
+              (progress-screen block-upload-complete)
+              (progress-screen block-error))
+             (draw-notice-screen self)
+             (draw-options self 165 0 0.82))
+            (((progress-screen block-guide))
+             (draw-notice-screen self)
+             (draw-options self 185 0 0.82))
+            (((progress-screen block-waiting))
+             (draw-notice-screen self))
             (((progress-screen memcard-data-exists) (progress-screen memcard-data-exists-save-and-load)) (draw-notice-screen self) (draw-options self 168 0 0.82))
             (((progress-screen memcard-loading)
               (progress-screen memcard-saving)
@@ -3801,6 +3953,7 @@
 (set! (-> progress-normal code)
       (lambda :behavior progress ()
         (loop
+          (adjust-ratios self (get-aspect-ratio) (get-video-mode))
           (when (and (cpad-hold? 0 l1) (cpad-hold? 0 r1) *cheat-mode*)
             (when (and (< (-> self task-index) (-> *level-task-data* (-> self display-level-index) nb-of-tasks))
                        (>= (-> self task-index) 0))
@@ -3885,7 +4038,11 @@
                    (= v1-74 (progress-screen quit))
                    (= v1-74 (progress-screen quit-title))
                    (= v1-74 (progress-screen memcard-auto-save-disabled))
-                   (= v1-74 (progress-screen memcard-disable-auto-save)))
+                   (= v1-74 (progress-screen memcard-disable-auto-save))
+                   (= v1-74 (progress-screen block-guide))
+                   (= v1-74 (progress-screen block-upload))
+                   (= v1-74 (progress-screen block-upload-complete))
+                   (= v1-74 (progress-screen block-error)))
                (respond-memcard self))))
           (suspend))
         (none)))
