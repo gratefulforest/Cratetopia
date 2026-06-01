@@ -48,7 +48,11 @@
   (progress-percent 31)
   (credits 32)
   (red-reverse 33)
-  (red-obverse 34))
+  (red-obverse 34)
+  (light-green 35)
+  (bronze 36)
+  (silver 37)
+  (gold 38))
 
 (defenum font-flags
   :type uint32
@@ -791,9 +795,54 @@
                       (static-rgba #x80 #x60 #x20 #x80)
                       (static-rgba #x60 #x00 #x00 #x80)
                       (static-rgba #x60 #x00 #x00 #x80)))
-            (new 'static 'char-color)
-            (new 'static 'char-color)
-            (new 'static 'char-color)
+            ;; 35 - light-green
+            (new 'static
+                 'char-color
+                 :color
+                 (new 'static
+                      'array
+                      rgba
+                      4
+                      (static-rgba #x00 #x80 #x00 #x80)
+                      (static-rgba #x00 #x80 #x00 #x80)
+                      (static-rgba #x00 #x4D #x00 #x80)
+                      (static-rgba #x00 #x4D #x00 #x80)))
+            ;; 36 - bronze
+            (new 'static
+                 'char-color
+                 :color
+                 (new 'static
+                      'array
+                      rgba
+                      4
+                      (static-rgba #x80 #x4E #x00 #x80)
+                      (static-rgba #x80 #x4E #x00 #x80)
+                      (static-rgba #x73 #x31 #x00 #x80)
+                      (static-rgba #x73 #x31 #x00 #x80)))
+            ;; 37 - silver
+            (new 'static
+                 'char-color
+                 :color
+                 (new 'static
+                      'array
+                      rgba
+                      4
+                      (static-rgba #x60 #x60 #x60 #x80)
+                      (static-rgba #x60 #x60 #x60 #x80)
+                      (static-rgba #x32 #x32 #x32 #x80)
+                      (static-rgba #x32 #x32 #x32 #x80)))
+            ;; 38 - gold
+            (new 'static
+                 'char-color
+                 :color
+                 (new 'static
+                      'array
+                      rgba
+                      4
+                      (static-rgba #x80 #x72 #x00 #x80)
+                      (static-rgba #x80 #x72 #x00 #x80)
+                      (static-rgba #x68 #x50 #x07 #x80)
+                      (static-rgba #x68 #x50 #x07 #x80)))
             (new 'static 'char-color)
             (new 'static 'char-color)
             (new 'static 'char-color)
