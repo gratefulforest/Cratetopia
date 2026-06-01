@@ -136,6 +136,11 @@
      (block-extras)
      (block-leaderboards)
      (block-scores)
+     (block-guide)
+     (block-upload)
+     (block-waiting)
+     (block-upload-complete)
+     (block-error)
      ;; the last one!
      (max))
    (defenum game-option-type
@@ -170,6 +175,7 @@
      (binding-assignment)
      (leaderboard)
      (username)
+     (score)
      (confirmation))) ;; end of PC_PORT = #t branch for enum initialization
   ) ;; end of PC_PORT cond
 
