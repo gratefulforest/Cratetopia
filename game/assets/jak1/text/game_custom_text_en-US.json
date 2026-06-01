@@ -38,7 +38,7 @@
   "1053": "4X",
   "1054": "8X",
   "1055": "16X",
-  "1060": "FRAME RATE (EXPERIMENTAL)",
+  "1060": "FRAME RATE",
   "1061": "60",
   "1062": "100",
   "1063": "150",
@@ -247,6 +247,8 @@
   "3007": "CRYSTAL GLOW",
   "3008": "EXTRAS",
   "3009": "LEADERBOARDS",
+  "3010": "UPLOAD SCORES",
+  "3011": "CONTROLLER LED STRENGTH",
 
   "4000": "A",
   "4001": "B",
