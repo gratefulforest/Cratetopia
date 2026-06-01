@@ -813,6 +813,8 @@
   (crystal-glow #x3007)
   (extras #x3008)
   (leaderboards #x3009)
+  (upload-scores #x3010)
+  (controller-led-strength #x3011)
 
   (a #x4000)
   (b #x4001)
