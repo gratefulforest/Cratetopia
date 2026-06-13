@@ -558,5 +558,6 @@ junglesnake-default-event-handler
   (junglesnake-method-22 this (-> this ry))
   (junglesnake-method-21 this)
   (logior! (-> this skel status) (janim-status inited))
-  (go junglesnake-sleeping)
+  (set! (-> this skel postbind-function) junglesnake-joint-callback)
+  (go junglesnake-tracking)
   (none))
