@@ -438,7 +438,6 @@
   (case-str *pc-temp-string*
     (("username") (set! (-> obj username) (file-stream-read-symbol file)))
     (("fisherman") (set! (-> obj fisherman) (file-stream-read-symbol file)))
-    (("controller-light") (set! (-> obj controller-light) (file-stream-read-float file)))
     (("money-starburst?") (set! (-> obj money-starburst?) (file-stream-read-symbol file)))
     (("extra-hud?") (set! (-> obj extra-hud?) (file-stream-read-symbol file)))
     (("skip-movies?") (set! (-> obj skip-movies?) (file-stream-read-symbol file)))
@@ -476,7 +475,6 @@
   ((method-of-type pc-settings handle-output-settings) obj file)
   (format file "  (username ~S)~%" (-> obj username))
   (format file "  (fisherman ~A)~%" (-> obj fisherman))
-  (format file "  (controller-light ~F)~%" (-> obj controller-light))
   (format file "  (money-starburst? ~A)~%" (-> obj money-starburst?))
   (format file "  (extra-hud? ~A)~%" (-> obj extra-hud?))
   (format file "  (skip-movies? ~A)~%" (-> obj skip-movies?))
