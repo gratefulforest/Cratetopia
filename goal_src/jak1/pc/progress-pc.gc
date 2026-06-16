@@ -1436,10 +1436,10 @@
   (none))
 
 (defbehavior draw-block-waiting progress ((arg0 font-context))
-  (set! (-> *progress-process* 0 particles 31 init-pos y) 220.0)
+  (set! (-> *progress-process* 0 particles 31 init-pos y) 215.0)
   (set! (-> *progress-process* 0 particles 31 init-pos x)
         (the float
-             (- (if (or (< (mod (-> *display* real-frame-counter) 300) 270) (!= (-> self transition-percentage-invert) 1.0)) 215 -1000)
+             (- (if (or (< (mod (-> *display* real-frame-counter) 300) 270) (!= (-> self transition-percentage-invert) 1.0)) 217 -1000)
                 (-> self left-x-offset))))
   (case (string->symbol *temp-string2*)
     (('block-error)
