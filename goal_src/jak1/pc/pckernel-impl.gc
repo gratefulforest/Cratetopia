@@ -79,7 +79,6 @@
    (subtitle-language   pc-language) ;; language for subtitles
    (username            symbol)
    (fisherman           symbol)
-   (controller-light    float)
    (money-starburst?    symbol) ;; add a starburst to the money
    (extra-hud?          symbol) ;; extra hud elements.
    (secrets             pc-game-secrets :inline) ;; hidden goodies and additional secrets!
@@ -146,7 +145,6 @@
   (set! (-> obj memcard-play-hints?) #t)
   (set! (-> obj username) (string->symbol ""))
   (set! (-> obj fisherman) #f)
-  (set! (-> obj controller-light) 100.0)
   0)
 
 (defmethod reset-extra ((obj pc-settings-jak1) (call-handlers symbol))
