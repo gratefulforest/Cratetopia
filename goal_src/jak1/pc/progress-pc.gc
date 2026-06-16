@@ -2346,7 +2346,7 @@
   (set! (-> *camera-options* 2 value-to-modify) (&-> *pc-settings* third-camera-h-inverted?))
   (set! (-> *camera-options* 3 value-to-modify) (&-> *pc-settings* third-camera-v-inverted?))
   ;; input options
-  (set! (-> *controller-options* 1 value-to-modify) (&-> *pc-settings* controller-light))
+  (set! (-> *controller-options* 1 value-to-modify) (&-> *pc-settings* controller-led-brightness))
   (set! (-> *controller-options* 2 value-to-modify) (&-> *pc-settings* memcard-vibration?))
   (set! (-> *controller-options* 3 value-to-modify) (&-> *pc-settings* stick-deadzone))
   (set! (-> *controller-options* 4 value-to-modify) (&-> *pc-settings* stick-sensitivity))
