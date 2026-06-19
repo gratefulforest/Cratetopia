@@ -1694,7 +1694,7 @@
        :nickname 'dar
        :packages '(darkcave)
        :sound-banks '(darkcave)
-       :music-bank 'maincave
+       :music-bank #f
        :ambient-sounds
        '()
        :mood '*darkcave-mood*
