@@ -99,19 +99,6 @@ void OpenGlDebugGui::finish_frame() {
 
 void OpenGlDebugGui::draw(const DmaStats& dma_stats) {
   if (ImGui::BeginMainMenuBar()) {
-    if (ImGui::BeginMenu("Debugging")) {
-      ImGui::MenuItem("Frame Time Plot", nullptr, &m_draw_frame_time);
-      ImGui::MenuItem("Render Debug", nullptr, &m_draw_debug);
-      ImGui::MenuItem("Profiler", nullptr, &m_draw_profiler);
-      ImGui::MenuItem("Small Profiler", nullptr, &small_profiler);
-      ImGui::MenuItem("Loader", nullptr, &m_draw_loader);
-      ImGui::MenuItem("Overlord", nullptr, &m_draw_overlord);
-      if (ImGui::MenuItem("Reboot In Debug Mode!")) {
-        want_reboot_in_debug = true;
-      }
-      ImGui::EndMenu();
-    }
-
     if (ImGui::BeginMenu("Tools")) {
       if (ImGui::BeginMenu("Screenshot")) {
         ImGui::MenuItem("Screenshot Next Frame!", nullptr, &m_want_screenshot);
@@ -123,8 +110,6 @@ void OpenGlDebugGui::draw(const DmaStats& dma_stats) {
         ImGui::Checkbox("Quick-Screenshot on F2", &screenshot_hotkey_enabled);
         ImGui::EndMenu();
       }
-      ImGui::MenuItem("Subtitle Editor", nullptr, &m_subtitle_editor);
-      ImGui::MenuItem("Debug Text Filter", nullptr, &m_filters_menu);
       ImGui::EndMenu();
     }
 
@@ -170,46 +155,6 @@ void OpenGlDebugGui::draw(const DmaStats& dma_stats) {
           ImGui::TreePop();
         }
       }
-
-      // FPS Stuff
-      ImGui::Separator();
-      if (ImGui::TreeNode("Frame Rate")) {
-        ImGui::Checkbox("Framelimiter", &Gfx::g_global_settings.framelimiter);
-        ImGui::InputFloat("Target FPS", &target_fps_input);
-        if (ImGui::MenuItem("Apply")) {
-          Gfx::g_global_settings.target_fps = target_fps_input;
-        }
-        ImGui::Separator();
-        ImGui::Checkbox("Accurate Lag Mode", &Gfx::g_global_settings.experimental_accurate_lag);
-        ImGui::Checkbox("Sleep in Frame Limiter", &Gfx::g_global_settings.sleep_in_frame_limiter);
-        ImGui::TreePop();
-      }
-      ImGui::EndMenu();
-    }
-
-    if (ImGui::BeginMenu("Event Profiler")) {
-      if (ImGui::Checkbox("Record Events", &record_events)) {
-        prof().set_enable(record_events);
-      }
-      ImGui::SameLine();
-      ImGui::Text("%s",
-                  fmt::format("({}/{})", prof().get_next_idx(), prof().get_max_events()).c_str());
-      ImGui::InputInt("Event Buffer Size", &max_event_buffer_size);
-      if (ImGui::Button("Resize")) {
-        prof().update_event_buffer_size(max_event_buffer_size);
-      }
-      if (ImGui::Button("Reset Events")) {
-        prof().clear();
-      }
-      ImGui::Separator();
-      ImGui::Checkbox("Enable Compression", &prof().m_enable_compression);
-      if (ImGui::Button("Dump to File")) {
-        record_events = false;
-        prof().dump_to_json();
-      }
-      // if (ImGui::Button("Open dump folder")) {
-      //  // TODO - https://github.com/mlabbe/nativefiledialog
-      // }
       ImGui::EndMenu();
     }
 
