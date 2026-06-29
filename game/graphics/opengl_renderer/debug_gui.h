@@ -17,11 +17,7 @@ class FrameTimeRecorder {
   void start_frame();
   void draw_window(const DmaStats& dma_stats);
   bool should_advance_frame() {
-    if (m_single_frame) {
-      m_single_frame = false;
       return true;
-    }
-    return m_play;
   }
 
   bool do_gl_finish = false;
