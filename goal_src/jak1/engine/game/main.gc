@@ -380,6 +380,7 @@
         (set! (-> *setting-control* default aspect-ratio) 'aspect4x3)
         (set-aspect-ratio 'aspect4x3)
         (true! (-> *pc-settings* aspect-ratio-auto?)))
+      (if (or (!= *cheat-mode* #f) *debug-segment*) (kernel-shutdown))
       (case *master-mode*
         (('pause 'menu 'progress)
           (pause-main-music))
