@@ -1411,7 +1411,7 @@
     (+! (-> arg0 origin y) 16.0)
     (print-game-text-scaled "ECO-BREAKS AREN\c12T LINES, SO DON\c12T SPEED YOU UP" anim arg0 128)
     (+! (-> arg0 origin y) 16.0)
-    (print-game-text-scaled "ANY SIZE MATCH IN CITADEL IS 100 * SPEED" anim arg0 128)
+    (print-game-text-scaled "ANY SIZE MATCH IN CITADEL DROP IS 100 * SPEED" anim arg0 128)
     (+! (-> arg0 origin y) 16.0)
     (print-game-text-scaled "RED ECO PUSHES DOWN, YELLOW SHOOTS SIDEWAYS" anim arg0 128)
     (+! (-> arg0 origin y) 16.0)
