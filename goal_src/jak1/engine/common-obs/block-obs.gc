@@ -972,8 +972,8 @@
   (draw-line (static-vectorm -1.4 2 0) (static-vector 0.0 0.0 0.0 -40.0))
   (draw-line (static-vectorm 19.4 2 0) (static-vector 0.0 0.0 0.0 -40.0))
   (when (= *hide* #t)
-    (draw-line (static-vectorm 26 -8 0) (static-vector -1.6 1.6 1.6 -1.6))
-    (draw-line (static-vectorm 26 -8 0) (static-vector -1.6 -1.6 1.6 1.6)))
+    (draw-line (static-vectorm 26.23 -8 0) (static-vector -1.6 1.6 1.6 -1.6))
+    (draw-line (static-vectorm 26.23 -8 0) (static-vector -1.6 -1.6 1.6 1.6)))
   (none))
 
 (defbehavior hold-button block-game ((button int))
