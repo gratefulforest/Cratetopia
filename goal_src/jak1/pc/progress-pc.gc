@@ -1472,7 +1472,7 @@
   (set! (-> arg0 flags) (font-flags shadow kerning middle middle-vert large))
   (let ((anim (-> self transition-percentage-invert)))
     (set! (-> arg0 origin y) 92.0)
-    (print-game-text-scaled (string-format "AN ERROR OCCURED") anim arg0 128))
+    (print-game-text-scaled "AN ERROR OCCURED" anim arg0 128))
   (none))
 
 (defbehavior draw-block-name-error progress ((arg0 font-context))
@@ -1483,7 +1483,7 @@
   (set! (-> arg0 flags) (font-flags shadow kerning middle middle-vert large))
   (let ((anim (-> self transition-percentage-invert)))
     (set! (-> arg0 origin y) 92.0)
-    (print-game-text-scaled (string-format "INVALID NAME") anim arg0 128))
+    (print-game-text-scaled "INVALID NAME" anim arg0 128))
   (none))
 
 (define *analog-bind-names*
@@ -3802,7 +3802,7 @@
         (((progress-screen block-waiting)) (draw-block-waiting a1-1))
         (((progress-screen block-upload-complete)) (draw-block-upload-complete a1-1))
         (((progress-screen block-error)) (draw-block-error a1-1))
-        (((progress-screen block-error)) (draw-block-name-error a1-1)))))
+        (((progress-screen block-name-error)) (draw-block-name-error a1-1)))))
   0
   (none))
 
