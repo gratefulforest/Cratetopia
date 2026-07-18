@@ -141,6 +141,7 @@
      (block-waiting)
      (block-upload-complete)
      (block-error)
+     (block-name-error)
      ;; the last one!
      (max))
    (defenum game-option-type
