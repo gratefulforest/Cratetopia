@@ -93,7 +93,7 @@
 (deftype block-id (structure) ((id int)))
 (define *block* (new 'static 'block-id :id 0))
 (define-extern reload-settings (function process string symbol))
-(define-extern get-points (function int int))
+(define-extern get-points (function int int int))
 
 (defmacro align (rot x y z &rest body)
   `(let ((offset (new-stack-vector0))
@@ -1047,7 +1047,7 @@
         (align (-> self root quat) (meters (rand-vu-float-range -30.0 50.0)) (meters (rand-vu-float-range -30.0 0.0)) 0.0
           (vector+! aligned aligned (-> self root trans))
           (process-spawn part-tracker :init part-tracker-init (-> *part-group-id-table* 3010) -1 #f #f #f aligned :to *entity-pool*))))
-    (when (and (= *mode* 'normal) (!= (-> self lost) 0) (< (get-points -1) 100000))
+    (when (and (= *mode* 'normal) (!= (-> self lost) 0) (< (get-points 0 -1) 100000))
       (set! (-> text color) (font-color white))
       (set-scale! text 0.65)
       (set! (-> text origin y) (if (= (-> self lost) 'record) 11.0 -15.0))
