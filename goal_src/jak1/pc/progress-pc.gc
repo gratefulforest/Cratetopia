@@ -14,8 +14,7 @@
 (define *score2* (new 'global 'vector))
 (define *score3* (new 'global 'vector))
 (define *score4* (new 'global 'vector))
-
-(define *match* #f)
+(define *board* 0)
 
 (defconstant PROGRESS_SCROLL_DIR_UP -1)
 
@@ -704,8 +703,8 @@
             :slider-step-size 0.25
             :on-confirm
             (lambda ()
-              (define-extern get-points (function int int))
-              (if (< (get-points -1) 100000) (set! (-> *pc-settings* fisherman) #f))
+              (define-extern get-points (function int int int))
+              (if (< (get-points 0 -1) 100000) (set! (-> *pc-settings* fisherman) #f))
               (start 'play (the continue-point #f))
               (initialize! *game-info* 'game (the-as game-save #f) "beach-start")))
        (new 'static
@@ -1340,11 +1339,11 @@
 
 (define-extern get-player (function int string symbol))
 (define-extern get-recent (function int symbol))
-(define-extern get-points (function int int))
-(define-extern get-lines (function int int))
-(define-extern get-level (function int int))
+(define-extern get-points (function int int int))
+(define-extern get-lines (function int int int))
+(define-extern get-level (function int int int))
 (define-extern upload-scores (function string string none))
-(define-extern fill-leaderboard (function string string none))
+(define-extern fill-leaderboard (function int string none))
 
 (defun build-block-leaderboards ((obj progress))
   (set! (-> *temp-options* length) 0)
@@ -2698,12 +2697,12 @@
                (cpad-clear! 0 circle)
                (case (-> options (-> obj option-index) name)
                  (((text-id my-scores))
-                  (set-vector! *score1* (the-as float (get-points -1)) (the-as float (get-lines -1)) (the-as float (get-level -1)) 1.0)
-                  (set-vector! *score2* (the-as float (get-points -2)) (the-as float (get-lines -2)) (the-as float (get-level -2)) 1.0)
-                  (set-vector! *score3* (the-as float (get-points -3)) (the-as float (get-lines -3)) (the-as float (get-level -3)) 1.0)
-                  (set-vector! *score4* (the-as float (get-points -4)) (the-as float (get-lines -4)) (the-as float (get-level -4)) 1.0))
+                  (set-vector! *score1* (the-as float (get-points 0 -1)) (the-as float (get-lines 0 -1)) (the-as float (get-level 0 -1)) 1.0)
+                  (set-vector! *score2* (the-as float (get-points 1 -2)) (the-as float (get-lines 1 -2)) (the-as float (get-level 1 -2)) 1.0)
+                  (set-vector! *score3* (the-as float (get-points 2 -3)) (the-as float (get-lines 2 -3)) (the-as float (get-level 2 -3)) 1.0)
+                  (set-vector! *score4* (the-as float (get-points 3 -4)) (the-as float (get-lines 3 -4)) (the-as float (get-level 3 -4)) 1.0))
                  (((text-id extras))
-                  (set! (-> *score1* x) (the-as float (get-points -1)))))
+                  (set! (-> *score1* x) (the-as float (get-points 0 -1)))))
                (cond
                  ((and (not (-> *setting-control* default auto-save))
                        (= (text-id disable-auto-save) (-> options (-> obj option-index) name)))
@@ -3024,12 +3023,11 @@
                  ((1) (pc-set-display-mode! 'fullscreen 0 0))
                  ((2) (pc-set-display-mode! 'borderless 0 0))))
               (((game-option-type leaderboard))
-               (let ((board (case (-> *progress-carousell* int-backup) ((0) "regular-game") ((1) "plant-battle") ((2) "citadel-drop") ((3) "crystal-glow"))))
-                 (push! obj)
-                 (set! *match* (if (= (-> *progress-carousell* int-backup) 2) #t #f))
-                 (clear *temp-string2*)
-                 (fill-leaderboard board *temp-string2*)
-                 (set! (-> obj next-display-state) (progress-screen block-waiting))))
+               (push! obj)
+               (set! *board* (-> *progress-carousell* int-backup))
+               (clear *temp-string2*)
+               (fill-leaderboard *board* *temp-string2*)
+               (set! (-> obj next-display-state) (progress-screen block-waiting)))
               (((game-option-type username))
                (let ((name (symbol->string (-> *pc-settings* username)))
                      (letter (case (-> *progress-carousell* int-backup)
@@ -3679,13 +3677,13 @@
                          (cond
                            ((and (= index (-> obj option-index)) (> elapsed 466))
                             (set-scale! font (* 0.57 f0-23 scroll-amt))
-                            (string-format "LEVEL:~D" (get-level index)))
+                            (string-format "LEVEL:~D" (get-level *board* index)))
                            ((and (= index (-> obj option-index)) (> elapsed 233))
                             (set-scale! font (* 0.57 f0-23 scroll-amt))
-                            (string-format "~S:~D" (if *match* "MATCH" "LINES") (get-lines index)))
+                            (string-format "~S:~D" (if (= *board* 2) "MATCH" "LINES") (get-lines *board* index)))
                            (else
                             (set-scale! font (* 0.65 f0-23 scroll-amt))
-                            (string-format "~D" (get-points index)))))
+                            (string-format "~D" (get-points *board* index)))))
                        (print-game-text *temp-string* font #f (the int (* 128.0 f0-23 scroll-amt)) 22)))
                     (else
                       (print-game-text option-str font #f (the int (* 128.0 f0-23 scroll-amt)) 22)))))
