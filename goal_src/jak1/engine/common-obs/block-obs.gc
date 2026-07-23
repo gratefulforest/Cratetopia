@@ -463,7 +463,7 @@
   -100))
 
 (defmacro for-direction (&rest body)
-  `(let ((direction 0)) (dotimes (times 4) (set! direction (case times ((0) -1) ((1) 1) ((2) -10) ((3) 10))) ,@body)))
+  `(let ((direction 0)) (dotimes (dir 4) (set! direction (case dir ((0) -1) ((1) 1) ((2) -10) ((3) 10))) ,@body)))
 
 (defmacro until-all (condition &rest body)
   `(let ((done #f)) (until done (set! done #t) (dotimes (all 200) (when (not ,condition) (set! done #f))) ,@body)))
@@ -518,6 +518,22 @@
           (-! search 10))))))
   (none))
 
+(defbehavior blue-effect block-game ((index int))
+  (for-direction
+    (send-event (fetch (step index direction #t)) 'notice)
+    (send-event (fetch (step (step index direction #t) direction #f)) 'notice))
+  (none))
+
+(defbehavior move-sound block-game ()
+  (case (-> (fetch -1) look)
+    ((7) (case type (('sideways) (sound-play "walk-grass2" :vol 90)) (('rotate) (dotimes (count 2) (sound-play "land-grass")))))
+    ((10 11 12 13 14) (case type (('sideways) (sound-play "walk-stone1")) (('rotate) (sound-play "bridge-piece-up" :vol 70))))
+    ((17 18 19 20) (case type (('sideways) (sound-play "walk-stone1")) (('rotate) (sound-play "get-red-eco" :pitch 0.7 :vol 60))))
+    ((22 23) (case type (('sideways) (sound-play "water-on" :pitch 3.0)) (('rotate) (sound-play "water-on" :pitch 2.0 :vol 125))))
+    ((24) (case type (('sideways) (sound-play "spider-step"))))
+    (else (case type (('sideways) (sound-play "walk-stone1")) (('rotate) (dotimes (count 2) (sound-play "jump"))))))
+  (none))
+
 (defbehavior move block-game ((piece int) (x int) (y int) (type symbol))
   (if (and (= (-> (fetch -1) look) 15) (or (= type 'down) (= type 'gravity))) (cage-effect))
   (for-block piece x y
@@ -532,21 +548,13 @@
   (when (!= type 'gravity)
     (set! (-> self moved) #t)
     (set-time! (-> self timeout)))
-  (if (!= *mode* 'menu) (case (-> (fetch -1) look)
-    ((7) (case type (('sideways) (sound-play "walk-grass2" :vol 90)) (('rotate) (dotimes (count 2) (sound-play "land-grass")))))
-    ((10 11 12 13 14) (case type (('sideways) (sound-play "walk-stone1")) (('rotate) (sound-play "bridge-piece-up" :vol 70))))
-    ((17 18 19 20) (case type (('sideways) (sound-play "walk-stone1")) (('rotate) (sound-play "get-red-eco" :pitch 0.7 :vol 60))))
-    ((22 23) (case type (('sideways) (sound-play "water-on" :pitch 3.0)) (('rotate) (sound-play "water-on" :pitch 2.0 :vol 125))))
-    ((24) (case type (('sideways) (sound-play "spider-step"))))
-    (else (case type (('sideways) (sound-play "walk-stone1")) (('rotate) (dotimes (count 2) (sound-play "jump")))))))
+  (if (!= *mode* 'menu) (move-sound))
   (for-block piece x y
     (send-event (fetch id) 'set-loc block-x block-y)
-    (if (and (= (-> (fetch id) look) 7) (= type 'rotate)) (send-event (fetch id) 'place))
-    (when (= (-> (fetch id) look) 19)
-      (for-direction
-        (send-event (fetch (step index direction #t)) 'notice)
-        (send-event (fetch (step (step index direction #t) direction #f)) 'notice)))
-    (if (and (= (-> (fetch id) look) 9) (!= type 'down)) (balloon-effect index)))
+    (case (-> (fetch -1) look)
+      ((7) (if (= type 'rotate) (send-event (fetch id) 'place)))
+      ((9) (if (!= type 'down) (balloon-effect index)))
+      ((19) (blue-effect index))))
   #t)
 
 (defbehavior warn block-game ()
@@ -729,6 +737,13 @@
       (set! (-> self field index) 7)))
   (none))
 
+(defbehavior shoot block-game ((leftmost int) (rightmost int))
+  (if (> (mod leftmost 10) 0) (send-event (fetch leftmost) 'shoot 'left))
+  (if (< (mod rightmost 10) 9) (send-event (fetch rightmost) 'shoot 'right))
+  (while (!= (step leftmost -1 #t) -100) (break-block (step leftmost -1 #t) 5 #t #t))
+  (while (!= (step rightmost 1 #t) -100) (break-block (step rightmost 1 #t) 5 #t #t))
+  (none))
+
 (defbehavior yellow-effect block-game ()
   (let ((clears 0))
     (dotimes (row 20)
@@ -741,10 +756,7 @@
             (if (> (+ y x) rightmost) (set! rightmost (+ y x)))))
         (when (or (!= leftmost 200) (!= rightmost -1))
           (+! clears 1)
-          (if (> (mod leftmost 10) 0) (send-event (fetch leftmost) 'shoot 'left))
-          (if (< (mod rightmost 10) 9) (send-event (fetch rightmost) 'shoot 'right))
-          (while (!= (step leftmost -1 #t) -100) (break-block (step leftmost -1 #t) 5 #t #t))
-          (while (!= (step rightmost 1 #t) -100) (break-block (step rightmost 1 #t) 5 #t #t)))
+          (shoot leftmost rightmost))
         (dotimes (x 10) (if (= (-> self field (+ y x)) 18) (break-block (+ y x) 0 #f #f)))
         (when (and (= leftmost 200) (= rightmost -1))
           (dotimes (x 10) (shift-down (+ y x) clears 0 0.0))))))
@@ -791,7 +803,7 @@
     (let ((count 0))
       (until-all (!= (-> self field all) 22)
         (for-field #t (case look ((23 122 126 99)
-          (for-direction (when (= times (rand-vu-int-range 0 3))
+          (for-direction (when (= dir (rand-vu-int-range 0 3))
             (let ((search (step index direction #f)))
               (if (rand-vu-percent? 0.5) (set! search (step search direction #f)))
               (when (= (-> self field search) 22)
