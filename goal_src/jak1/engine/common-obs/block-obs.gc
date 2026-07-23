@@ -524,7 +524,7 @@
     (send-event (fetch (step (step index direction #t) direction #f)) 'notice))
   (none))
 
-(defbehavior move-sound block-game ()
+(defbehavior move-sound block-game ((type symbol))
   (case (-> (fetch -1) look)
     ((7) (case type (('sideways) (sound-play "walk-grass2" :vol 90)) (('rotate) (dotimes (count 2) (sound-play "land-grass")))))
     ((10 11 12 13 14) (case type (('sideways) (sound-play "walk-stone1")) (('rotate) (sound-play "bridge-piece-up" :vol 70))))
@@ -548,7 +548,7 @@
   (when (!= type 'gravity)
     (set! (-> self moved) #t)
     (set-time! (-> self timeout)))
-  (if (!= *mode* 'menu) (move-sound))
+  (if (!= *mode* 'menu) (move-sound type))
   (for-block piece x y
     (send-event (fetch id) 'set-loc block-x block-y)
     (case (-> (fetch -1) look)
