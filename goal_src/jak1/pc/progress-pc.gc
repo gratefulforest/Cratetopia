@@ -764,15 +764,15 @@
        (new 'static
             'game-option
             :option-type (game-option-type menu)
-            :name (text-id my-scores)
-            :scale #t
-            :param3 (game-option-menu block-scores))
-       (new 'static
-            'game-option
-            :option-type (game-option-type menu)
             :name (text-id how-to-play)
             :scale #t
             :param3 (game-option-menu block-guide))
+       (new 'static
+            'game-option
+            :option-type (game-option-type menu)
+            :name (text-id my-scores)
+            :scale #t
+            :param3 (game-option-menu block-scores))
        (new 'static
             'game-option
             :option-type (game-option-type on-off)
