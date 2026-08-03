@@ -1434,6 +1434,13 @@
     (print-game-text-scaled (string-format "~S" (-> *pc-settings* username)) anim arg0 128))
   (none))
 
+(defbehavior refresh-scores progress ()
+  (set-vector! *score1* (the-as float (get-points 0 -1)) (the-as float (get-lines 0 -1)) (the-as float (get-level 0 -1)) 1.0)
+  (set-vector! *score2* (the-as float (get-points 1 -2)) (the-as float (get-lines 1 -2)) (the-as float (get-level 1 -2)) 1.0)
+  (set-vector! *score3* (the-as float (get-points 2 -3)) (the-as float (get-lines 2 -3)) (the-as float (get-level 2 -3)) 1.0)
+  (set-vector! *score4* (the-as float (get-points 3 -4)) (the-as float (get-lines 3 -4)) (the-as float (get-level 3 -4)) 1.0)
+  (none))
+
 (defbehavior draw-block-waiting progress ((arg0 font-context))
   (set! (-> *progress-process* 0 particles 31 init-pos y) 215.0)
   (set! (-> *progress-process* 0 particles 31 init-pos x)
@@ -2697,10 +2704,7 @@
                (cpad-clear! 0 circle)
                (case (-> options (-> obj option-index) name)
                  (((text-id my-scores))
-                  (set-vector! *score1* (the-as float (get-points 0 -1)) (the-as float (get-lines 0 -1)) (the-as float (get-level 0 -1)) 1.0)
-                  (set-vector! *score2* (the-as float (get-points 1 -2)) (the-as float (get-lines 1 -2)) (the-as float (get-level 1 -2)) 1.0)
-                  (set-vector! *score3* (the-as float (get-points 2 -3)) (the-as float (get-lines 2 -3)) (the-as float (get-level 2 -3)) 1.0)
-                  (set-vector! *score4* (the-as float (get-points 3 -4)) (the-as float (get-lines 3 -4)) (the-as float (get-level 3 -4)) 1.0))
+                  (refresh-scores))
                  (((text-id extras))
                   (set! (-> *score1* x) (the-as float (get-points 0 -1)))))
                (cond
@@ -3138,6 +3142,7 @@
           (((progress-screen block-error)
             (progress-screen block-name-error))
            (sound-play "cursor-options")
+           (refresh-scores)
            (set! (-> obj next-display-state) (progress-screen block-scores)))
           (((progress-screen block-upload))
            (cond
@@ -3148,6 +3153,7 @@
               (set! (-> obj next-display-state) (progress-screen block-waiting)))
              (else
               (sound-play "cursor-options")
+              (refresh-scores)
               (set! (-> obj next-display-state) (progress-screen block-scores)))))
           (((progress-screen memcard-data-exists))
            (cond
