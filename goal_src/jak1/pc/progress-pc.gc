@@ -745,6 +745,11 @@
               (initialize! *game-info* 'game (the-as game-save #f) "darkcave-start")))
        (new 'static
             'game-option
+            :option-type (game-option-type leaderboard)
+            :name (text-id leaderboards)
+            :scale #t)
+       (new 'static
+            'game-option
             :option-type (game-option-type menu)
             :name (text-id extras)
             :scale #t
@@ -756,11 +761,6 @@
        'boxed-array
        :type
        game-option
-       (new 'static
-            'game-option
-            :option-type (game-option-type leaderboard)
-            :name (text-id leaderboards)
-            :scale #t)
        (new 'static
             'game-option
             :option-type (game-option-type menu)
@@ -1482,7 +1482,7 @@
   (set! (-> arg0 flags) (font-flags shadow kerning middle middle-vert large))
   (let ((anim (-> self transition-percentage-invert)))
     (set! (-> arg0 origin y) 92.0)
-    (print-game-text-scaled "INVALID NAME" anim arg0 128))
+    (print-game-text-scaled "PLEASE ENTER NAME" anim arg0 128))
   (none))
 
 (define *analog-bind-names*
@@ -2277,9 +2277,9 @@
   (set! (-> *block-menu* 2 value-to-modify) (&-> *progress-carousell* int-backup))
   (set! (-> *block-menu* 3 value-to-modify) (&-> *progress-carousell* int-backup))
   (set! (-> *block-menu* 4 value-to-modify) (&-> *progress-carousell* int-backup))
+  (set! (-> *block-menu* 5 value-to-modify) (&-> *progress-carousell* int-backup))
   (set! (-> *options-remap* (progress-screen block-extras)) *block-extras*)
-  (set! (-> *block-extras* 0 value-to-modify) (&-> *progress-carousell* int-backup))
-  (set! (-> *block-extras* 3 value-to-modify) (&-> *pc-settings* fisherman))
+  (set! (-> *block-extras* 2 value-to-modify) (&-> *pc-settings* fisherman))
   (set! (-> *options-remap* (progress-screen block-leaderboards)) *temp-options*)
   (set! (-> *options-remap* (progress-screen block-scores)) *temp-options*)
   (set! (-> *options-remap* (progress-screen block-guide)) *ok-options*)
@@ -3132,11 +3132,13 @@
              (else (sound-play "cursor-options") (set! (-> obj next-display-state) (progress-screen invalid)))))
           (((progress-screen memcard-insert)
             (progress-screen block-guide)
-            (progress-screen block-upload-complete)
-            (progress-screen block-error)
-            (progress-screen block-name-error))
+            (progress-screen block-upload-complete))
            (sound-play "cursor-options")
            (set! (-> obj next-display-state) (progress-screen invalid)))
+          (((progress-screen block-error)
+            (progress-screen block-name-error))
+           (sound-play "cursor-options")
+           (set! (-> obj next-display-state) (progress-screen block-scores)))
           (((progress-screen block-upload))
            (cond
              ((-> *progress-state* yes-no-choice)
