@@ -2418,7 +2418,7 @@
     (when (and options (not (or (progress-scrolling?) (-> obj in-transition))))
       ;; only respond to inputs when transition is done (and also there's options at all)
       (cond
-        ((or (cpad-pressed? 0 up) (and (cpad-hold? 0 up) (>= (- (-> *display* real-frame-counter) (-> obj last-option-index-change)) 45)))
+        ((or (cpad-pressed? 0 up) (and (cpad-hold? 0 up) (>= (- (-> *display* real-frame-counter) (-> obj last-option-index-change)) 50)))
          ;; pressed up
          ;; original code checked hold and then press, because hold can be used during center screen option. which we don't use.
          (when (not (-> obj selected-option))
@@ -2432,7 +2432,7 @@
              (else
               (set! (-> obj option-index) (1- (length options)))
               (set! (-> *progress-scroll* start-index) (max 0 (- (length options) *items-per-page* -1)))))))
-        ((or (cpad-pressed? 0 down) (and (cpad-hold? 0 down) (>= (- (-> *display* real-frame-counter) (-> obj last-option-index-change)) 45)))
+        ((or (cpad-pressed? 0 down) (and (cpad-hold? 0 down) (>= (- (-> *display* real-frame-counter) (-> obj last-option-index-change)) 50)))
          ;; pressed down.
          (when (not (-> obj selected-option))
            (if (!= (length options) 1) (sound-play "cursor-up-down"))
