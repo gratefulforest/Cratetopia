@@ -296,6 +296,7 @@
     ((and (= (-> self look) 15) (!= (-> self id) -100))
      (let ((pos (new-stack-vector0))
            (bars (-> (the citb-sagecage (process-by-type citb-sagecage *active-pool*)) bar-array)))
+       (vector-copy! *particle-quat* (static-vector 0.7 0.0 0.0 0.7))
        (dotimes (count 12)
          (vector-matrix*! pos (-> bars count) (-> self node-list data 3 bone transform))
          (launch-particles :system *sp-particle-system-3d* (-> *part-id-table* 2473) pos :rate DISPLAY_FPS_RATIO)))))
