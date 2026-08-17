@@ -1,0 +1,3 @@
+[submodule "game/external/leaderboard-cpp"]
+	path = game/external/leaderboard-cpp
+	url = git@github.com:gratefulforest/leaderboard-cpp.git
