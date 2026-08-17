@@ -36,6 +36,8 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
+          ssh-key: ${{ secrets.leaderboard-key }}
+          submodules: true
 
       - name: Install Package Dependencies
         env:

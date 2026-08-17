@@ -78,3 +78,4 @@ jobs:
       toolingRepo: ${{ needs.prep_vars.outputs.tooling_repo }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
+      leaderboard-key: ${{ secrets.SUBMODULE_SSH_KEY }}

@@ -56,6 +56,8 @@ on:
       token:
         description: "GitHub token used to create the release and push assets to it."
         required: true
+      leaderboard-key:
+        required: false
     outputs:
       taggedVersion:
         description: "The version that was tagged and pushed for the mod"
