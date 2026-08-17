@@ -1,4 +1,5 @@
 #include "kmachine.h"
+#include "game/external/leaderboard.h"
 
 #include <chrono>
 #include <fstream>
@@ -1371,4 +1372,14 @@ void init_common_pc_port_functions(
   make_func_symbol_func("pc-screen-shot", (void*)pc_screen_shot);
   make_func_symbol_func("pc-register-screen-shot-settings",
                         (void*)pc_register_screen_shot_settings);
+
+  // leaderboard functions
+  make_func_symbol_func("upload-scores", (void*)upload_scores);
+  make_func_symbol_func("fill-leaderboard", (void*)fill_leaderboard);
+  make_func_symbol_func("get-player", (void*)get_player);
+  make_func_symbol_func("get-recent", (void*)get_recent);
+  make_func_symbol_func("get-points", (void*)get_points);
+  make_func_symbol_func("get-lines", (void*)get_lines);
+  make_func_symbol_func("get-level", (void*)get_level);
+  make_func_symbol_func("reload-settings", (void*)reload_settings);
 }
