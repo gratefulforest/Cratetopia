@@ -615,13 +615,7 @@ void GLDisplay::render() {
     glFinish();
   }
 
-  // switch vsync modes, if requested
-  if (Gfx::g_global_settings.vsync != Gfx::g_global_settings.old_vsync) {
-    Gfx::g_global_settings.old_vsync = Gfx::g_global_settings.vsync;
-    // NOTE - -1 can be used for adaptive vsync, maybe useful for Jak 2+?
-    // https://wiki.libsdl.org/SDL3/SDL_GL_SetSwapInterval
-    SDL_GL_SetSwapInterval(Gfx::g_global_settings.vsync);
-  }
+  SDL_GL_SetSwapInterval(1);
 
   // Start timing for the next frame.
   g_gfx_data->debug_gui.start_frame();
